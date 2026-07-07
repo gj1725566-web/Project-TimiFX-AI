@@ -1,0 +1,103 @@
+/* ===========================================
+   TimiFX AI Website v1.0
+   Author: Timilehin
+=========================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:Arial, Helvetica, sans-serif;
+    background:#f4f7fc;
+    color:#333;
+}
+
+header{
+    background:#1565C0;
+    color:white;
+    text-align:center;
+    padding:40px 20px;
+}
+
+header h1{
+    font-size:48px;
+}
+
+header p{
+    margin-top:10px;
+    font-size:20px;
+}
+
+nav{
+    background:#0D47A1;
+    text-align:center;
+    padding:15px;
+}
+
+nav a{
+    color:white;
+    text-decoration:none;
+    margin:0 20px;
+    font-weight:bold;
+}
+
+nav a:hover{
+    color:#FFD54F;
+}
+
+main{
+    width:90%;
+    max-width:1000px;
+    margin:40px auto;
+}
+
+section{
+    background:white;
+    padding:30px;
+    margin-bottom:30px;
+    border-radius:10px;
+    box-shadow:0 4px 8px rgba(0,0,0,0.1);
+}
+
+section h2{
+    color:#1565C0;
+    margin-bottom:20px;
+}
+
+section p{
+    margin-bottom:20px;
+    line-height:1.8;
+}
+
+ul{
+    padding-left:20px;
+}
+
+li{
+    margin-bottom:10px;
+}
+
+button{
+    background:#1565C0;
+    color:white;
+    border:none;
+    padding:15px 30px;
+    font-size:16px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#0D47A1;
+}
+
+footer{
+    background:#1565C0;
+    color:white;
+    text-align:center;
+    padding:20px;
+    margin-top:40px;
+}
