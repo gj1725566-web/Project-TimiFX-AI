@@ -1,7 +1,7 @@
 """
 ===========================================
 TimiFX AI Backend Server
-Phase 12 - Full Brain Pipeline Integration
+Phase 13 - Adaptive Brain Integration
 Author: Timilehin
 ===========================================
 """
@@ -38,11 +38,15 @@ from datetime import datetime
 
 from brain.pipeline import run_pipeline
 
+from brain.profile import load_profile
+
+
 
 from database.memory import (
     save_conversation,
     get_conversation_history
 )
+
 
 
 
@@ -65,7 +69,7 @@ def home():
 
         "status": "online",
 
-        "brain": "Pipeline Active",
+        "brain": "Adaptive Pipeline Active",
 
         "systems": [
 
@@ -77,11 +81,15 @@ def home():
 
             "Conversation Memory",
 
+            "User Profile Memory",
+
+            "Context Manager",
+
             "AI Engine"
 
         ],
 
-        "version": "Phase 12",
+        "version": "Phase 13",
 
         "time": str(
             datetime.now()
@@ -117,6 +125,7 @@ def chat():
 
 
 
+
     user_message = data.get(
 
         "message",
@@ -144,10 +153,11 @@ def chat():
 
 
 
+
     try:
 
 
-        # Send message through full TimiFX brain pipeline
+        # Full TimiFX brain execution
 
         pipeline_result = run_pipeline(
 
@@ -156,12 +166,15 @@ def chat():
         )
 
 
-
         ai_reply = pipeline_result[
 
             "response"
 
         ]
+
+
+
+        user_profile = load_profile()
 
 
 
@@ -180,7 +193,9 @@ def chat():
 
 
 
-    # Save conversation memory
+
+
+    # Save conversation
 
 
     save_conversation(
@@ -211,7 +226,9 @@ def chat():
 
 
 
+
     return jsonify({
+
 
         "user_message":
 
@@ -237,6 +254,7 @@ def chat():
 
 
 
+
         "plan":
 
             pipeline_result.get(
@@ -246,6 +264,7 @@ def chat():
                 {}
 
             ),
+
 
 
 
@@ -261,6 +280,14 @@ def chat():
 
 
 
+
+        "profile":
+
+            user_profile,
+
+
+
+
         "memory_used":
 
             pipeline_result.get(
@@ -270,6 +297,7 @@ def chat():
                 False
 
             ),
+
 
 
 
@@ -284,6 +312,7 @@ def chat():
                 )
 
             ),
+
 
 
 
@@ -332,7 +361,17 @@ if __name__ == "__main__":
 
 
     print(
-        "🔗 Full Brain Pipeline Connected"
+        "🧠 Context Manager Loaded"
+    )
+
+
+    print(
+        "👤 User Profile Memory Loaded"
+    )
+
+
+    print(
+        "🔗 Full Adaptive Brain Connected"
     )
 
 
