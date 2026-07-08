@@ -1,7 +1,9 @@
 /* ===========================================
-   TimiFX AI Website v1.0
+   TimiFX AI Website v1.1
+   Professional AI Landing Page
    Author: Timilehin
 =========================================== */
+
 
 *{
     margin:0;
@@ -9,95 +11,265 @@
     box-sizing:border-box;
 }
 
+
 body{
-    font-family:Arial, Helvetica, sans-serif;
+
+    font-family: Arial, Helvetica, sans-serif;
+
     background:#f4f7fc;
+
     color:#333;
+
+    line-height:1.6;
+
 }
 
-header{
-    background:#1565C0;
+
+
+/* HERO SECTION */
+
+.hero{
+
+    background:linear-gradient(
+        135deg,
+        #1565C0,
+        #0D47A1
+    );
+
     color:white;
+
     text-align:center;
-    padding:40px 20px;
+
+    padding:80px 20px;
+
 }
 
-header h1{
-    font-size:48px;
+
+
+.hero h1{
+
+    font-size:60px;
+
+    margin-bottom:15px;
+
 }
 
-header p{
-    margin-top:10px;
-    font-size:20px;
+
+
+.hero p{
+
+    font-size:24px;
+
 }
+
+
+
+.hero-text{
+
+    font-size:18px !important;
+
+    margin:20px auto;
+
+    max-width:700px;
+
+}
+
+
+
+/* NAVIGATION */
+
 
 nav{
+
     background:#0D47A1;
+
+    padding:18px;
+
     text-align:center;
-    padding:15px;
+
 }
+
+
 
 nav a{
+
     color:white;
+
     text-decoration:none;
+
     margin:0 20px;
+
     font-weight:bold;
+
 }
+
+
 
 nav a:hover{
+
     color:#FFD54F;
+
 }
+
+
+
+/* MAIN */
+
 
 main{
+
     width:90%;
-    max-width:1000px;
-    margin:40px auto;
+
+    max-width:1100px;
+
+    margin:50px auto;
+
 }
+
+
 
 section{
+
     background:white;
-    padding:30px;
-    margin-bottom:30px;
-    border-radius:10px;
-    box-shadow:0 4px 8px rgba(0,0,0,0.1);
+
+    padding:35px;
+
+    margin-bottom:35px;
+
+    border-radius:15px;
+
+    box-shadow:
+    0 8px 20px rgba(0,0,0,0.08);
+
 }
+
+
 
 section h2{
+
     color:#1565C0;
+
     margin-bottom:20px;
+
+    font-size:32px;
+
 }
 
-section p{
-    margin-bottom:20px;
-    line-height:1.8;
-}
 
-ul{
-    padding-left:20px;
-}
 
-li{
-    margin-bottom:10px;
-}
+/* BUTTON */
+
 
 button{
-    background:#1565C0;
-    color:white;
+
+    margin-top:25px;
+
+    background:#FFD54F;
+
+    color:#333;
+
     border:none;
-    padding:15px 30px;
-    font-size:16px;
-    border-radius:8px;
+
+    padding:16px 35px;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    border-radius:30px;
+
     cursor:pointer;
+
 }
+
+
 
 button:hover{
-    background:#0D47A1;
+
+    background:white;
+
 }
 
-footer{
-    background:#1565C0;
-    color:white;
+
+
+/* FEATURE CARDS */
+
+
+.features{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+    gap:25px;
+
+}
+
+
+
+.card{
+
+    background:#f4f7fc;
+
+    padding:25px;
+
+    border-radius:12px;
+
     text-align:center;
-    padding:20px;
-    margin-top:40px;
+
+}
+
+
+
+.card h3{
+
+    color:#1565C0;
+
+    margin-bottom:15px;
+
+}
+
+
+
+/* FOOTER */
+
+
+footer{
+
+    background:#1565C0;
+
+    color:white;
+
+    text-align:center;
+
+    padding:25px;
+
+}
+
+
+
+/* MOBILE RESPONSIVE */
+
+
+@media(max-width:600px){
+
+
+    .hero h1{
+
+        font-size:40px;
+
+    }
+
+
+
+    nav a{
+
+        display:block;
+
+        margin:12px;
+
+    }
+
+
 }

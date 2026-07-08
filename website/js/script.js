@@ -1,29 +1,37 @@
 /* ===========================================
-   TimiFX AI Website v1.0
+   TimiFX AI Website v1.1
+   Interactive Features
    Author: Timilehin
 =========================================== */
 
+
 const button = document.getElementById("comingSoonBtn");
 
-button.addEventListener("click", function () {
+
+button.addEventListener("click", function(){
+
 
     alert(
+
 `🚀 Welcome to TimiFX AI!
 
 Thank you for visiting.
 
-This website is the beginning of an exciting journey.
-
 TimiFX AI is currently under development.
 
-Stay tuned for amazing features!
+Upcoming features:
 
-- Intelligent AI Assistant
-- Telegram Automation
-- Smart Memory
-- Founder Mode
+🤖 Intelligent AI Assistant
+⚡ Telegram Automation
+🧠 Smart Memory System
+🎤 Voice Support
+👑 Founder Mode
+
+The future of AI starts here.
 
 Built by Timilehin 💙`
+
     );
+
 
 });
