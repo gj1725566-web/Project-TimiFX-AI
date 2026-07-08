@@ -1,86 +1,150 @@
 """
 ===========================================
-TimiFX AI Engine
+TimiFX AI Core Intelligence Engine
+Phase 10 - Knowledge Memory Integration
 Author: Timilehin
-Version: Phase 9
 ===========================================
 """
 
+
 import os
+import json
 
 from dotenv import load_dotenv
 from groq import Groq
 
 from brain.personality import SYSTEM_PROMPT
-from brain.profile import FOUNDER_PROFILE
 
 
 # Load environment variables
+
 load_dotenv()
 
 
-# Create Groq client
+
+# Groq Client
+
 client = Groq(
     api_key=os.getenv("GROQ_API_KEY")
 )
 
 
+
+# Knowledge Memory File
+
+KNOWLEDGE_FILE = "database/knowledge.json"
+
+
+
+def load_knowledge():
+
+    if not os.path.exists(
+        KNOWLEDGE_FILE
+    ):
+
+        return {}
+
+
+    with open(
+        KNOWLEDGE_FILE,
+        "r",
+        encoding="utf-8"
+    ) as file:
+
+        return json.load(file)
+
+
+
+def build_memory_context():
+
+    knowledge = load_knowledge()
+
+
+    if not knowledge:
+
+        return (
+            "No important user knowledge stored yet."
+        )
+
+
+    context = """
+Important information about the user:
+
+"""
+
+
+    for category, data in knowledge.items():
+
+        context += f"\n{category.upper()}:\n"
+
+
+        for key, value in data.items():
+
+            context += (
+                f"- {key}: {value}\n"
+            )
+
+
+    return context
+
+
+
+
 def generate_response(conversation):
-    """
-    Generate an AI response using the
-    conversation history.
-    """
+
+
+    memory_context = build_memory_context()
+
+
 
     messages = [
 
         {
             "role": "system",
-            "content": SYSTEM_PROMPT
-        },
 
-        {
-            "role": "system",
-            "content": f"""
-Founder Information
+            "content":
+            SYSTEM_PROMPT
+            +
+            "\n\n"
+            +
+            memory_context
 
-Name: {FOUNDER_PROFILE['name']}
-
-Role: {FOUNDER_PROFILE['role']}
-
-Project: {FOUNDER_PROFILE['project']}
-
-Mission:
-{FOUNDER_PROFILE['goal']}
-
-Always remember that you were created by this founder.
-
-Be respectful.
-
-Help the founder build TimiFX AI into one of the world's best AI assistants.
-"""
         }
 
     ]
 
-    # Add previous conversation
-    messages.extend(conversation)
 
-    # Generate response
+
+    messages.extend(
+        conversation
+    )
+
+
+
     response = client.chat.completions.create(
 
-        model="llama-3.3-70b-versatile",
+        model=
+        "llama-3.3-70b-versatile",
 
-        messages=messages,
+
+        messages=
+        messages,
+
 
         temperature=0.7
 
     )
 
+
+
     return (
 
         response
+
         .choices[0]
+
         .message
+
         .content
 
     )
