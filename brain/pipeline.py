@@ -2,13 +2,16 @@
 ===========================================
 TimiFX AI Intelligence Pipeline
 Author: Timilehin
-Version: 1.1
+Version: 1.3
 
 Connects:
 - Reasoning Engine
 - Planning Engine
-- Memory System
+- Conversation Memory
 - Knowledge System
+- Memory Extractor
+- Context Manager
+- User Profile Engine
 - AI Engine
 ===========================================
 """
@@ -18,7 +21,6 @@ import sys
 import os
 
 
-# Add project root to Python path
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
         os.path.abspath(__file__)
@@ -38,20 +40,27 @@ from brain.reasoning import analyze_intent
 
 from brain.planner import create_plan
 
+from brain.context_manager import (
+    process_user_memory
+)
+
+from brain.profile import (
+    load_profile
+)
 
 from database.memory import (
     get_conversation_history
 )
 
-
 from database.knowledge import (
     get_knowledge
 )
 
-
 from backend.ai_engine import (
     generate_response
 )
+
+
 
 
 
@@ -70,7 +79,26 @@ def run_pipeline(
 
 
 
-    # 2. Load memory
+
+
+    # 2. Learn from message
+
+    process_user_memory(
+        user_message
+    )
+
+
+
+    # Reload updated profile
+
+    profile = load_profile()
+
+
+
+
+
+
+    # 3. Load conversation memory
 
     memory = []
 
@@ -83,7 +111,11 @@ def run_pipeline(
 
 
 
-    # 3. Load knowledge
+
+
+
+
+    # 4. Load knowledge
 
     knowledge = {}
 
@@ -94,7 +126,10 @@ def run_pipeline(
 
 
 
-    # 4. Create plan
+
+
+
+    # 5. Create plan
 
     plan = None
 
@@ -102,9 +137,11 @@ def run_pipeline(
     if reasoning["intent"] in [
 
         "programming",
+
         "general"
 
     ]:
+
 
         plan = create_plan(
             user_message
@@ -112,7 +149,11 @@ def run_pipeline(
 
 
 
-    # 5. Build conversation
+
+
+
+
+    # 6. Build conversation
 
     conversation = []
 
@@ -120,6 +161,7 @@ def run_pipeline(
     conversation.extend(
         memory
     )
+
 
 
     conversation.append(
@@ -136,7 +178,11 @@ def run_pipeline(
 
 
 
-    # 6. Ask AI engine
+
+
+
+
+    # 7. Generate answer
 
     response = generate_response(
         conversation
@@ -144,20 +190,49 @@ def run_pipeline(
 
 
 
+
+
+
+
     return {
 
-        "response": response,
 
-        "reasoning": reasoning,
+        "response":
 
-        "plan": plan,
+            response,
 
-        "knowledge": knowledge,
+
+
+        "reasoning":
+
+            reasoning,
+
+
+
+        "plan":
+
+            plan,
+
+
+
+        "knowledge":
+
+            knowledge,
+
+
+
+        "profile":
+
+            profile,
+
+
 
         "memory_used":
-        reasoning["use_memory"]
+
+            reasoning["use_memory"]
 
     }
+
 
 
 
@@ -167,7 +242,7 @@ if __name__ == "__main__":
 
     result = run_pipeline(
 
-        "Help me build a Telegram bot"
+        "I love Python and I want to build AI tools"
 
     )
 
