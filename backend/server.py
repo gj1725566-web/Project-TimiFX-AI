@@ -1,7 +1,10 @@
 import sys
 import os
 
-# Add project root directory to Python path
+# ===========================================
+# Add Project Root
+# ===========================================
+
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
         os.path.abspath(__file__)
@@ -11,21 +14,37 @@ PROJECT_ROOT = os.path.dirname(
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 
+
+# ===========================================
+# Imports
+# ===========================================
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
 
 from backend.ai_engine import generate_response
 
+from brain.reasoning import analyze_intent
+
 from database.memory import (
     save_conversation,
     get_conversation_history
 )
 
+
+# ===========================================
+# Flask
+# ===========================================
+
 app = Flask(__name__)
 
 CORS(app)
 
+
+# ===========================================
+# Home
+# ===========================================
 
 @app.route("/", methods=["GET"])
 def home():
@@ -34,18 +53,24 @@ def home():
 
         "project": "TimiFX AI",
 
+        "version": "Phase 11",
+
         "status": "online",
 
         "ai_engine": "Groq",
 
-        "memory": "Conversation Memory Active",
+        "reasoning": "Enabled",
 
-        "version": "Phase 8",
+        "memory": "Conversation Memory Active",
 
         "time": str(datetime.now())
 
     })
 
+
+# ===========================================
+# Chat
+# ===========================================
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -67,7 +92,7 @@ def chat():
     ).strip()
 
 
-    if not user_message:
+    if user_message == "":
 
         return jsonify({
 
@@ -76,13 +101,30 @@ def chat():
         }), 400
 
 
-    # Load previous conversation
-    conversation = get_conversation_history(
-        "Timilehin"
+    # =======================================
+    # Analyze User Intent
+    # =======================================
+
+    reasoning = analyze_intent(
+        user_message
     )
 
 
-    # Add newest user message
+    # =======================================
+    # Load Memory
+    # =======================================
+
+    conversation = []
+
+    if reasoning["use_memory"]:
+
+        conversation = get_conversation_history(
+            "Timilehin"
+        )
+
+
+    # Add newest message
+
     conversation.append({
 
         "role": "user",
@@ -91,6 +133,10 @@ def chat():
 
     })
 
+
+    # =======================================
+    # Generate AI Response
+    # =======================================
 
     try:
 
@@ -107,7 +153,10 @@ def chat():
         }), 500
 
 
-    # Save conversation
+    # =======================================
+    # Save Memory
+    # =======================================
+
     save_conversation(
 
         "Timilehin",
@@ -129,24 +178,40 @@ def chat():
     )
 
 
+    # =======================================
+    # Response
+    # =======================================
+
     return jsonify({
 
         "user_message": user_message,
 
+        "intent": reasoning["intent"],
+
+        "memory_used": reasoning["use_memory"],
+
+        "knowledge_used": reasoning["use_knowledge"],
+
         "ai_response": ai_reply,
 
         "memory_count": len(
+
             get_conversation_history(
+
                 "Timilehin"
+
             )
+
         ),
 
-        "time": str(
-            datetime.now()
-        )
+        "time": str(datetime.now())
 
     })
 
+
+# ===========================================
+# Main
+# ===========================================
 
 if __name__ == "__main__":
 
@@ -155,6 +220,8 @@ if __name__ == "__main__":
     print("🧠 AI Engine Loaded")
 
     print("💾 Memory System Loaded")
+
+    print("🤔 Reasoning Engine Loaded")
 
     app.run(
 
