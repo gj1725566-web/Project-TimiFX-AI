@@ -1,51 +1,85 @@
-"""
-===========================================
-TimiFX AI Memory System v2.0
-
-Simple User Memory Foundation
-
-Author: Timilehin
-===========================================
-"""
+import json
+import os
 
 
-users = {}
+MEMORY_FILE = "database/memory.json"
 
 
-def save_user(user_id, name):
+def load_memory():
 
-    users[user_id] = {
+    if not os.path.exists(MEMORY_FILE):
 
-        "name": name,
-
-        "messages": []
-
-    }
+        return {}
 
 
-def add_message(user_id, message):
+    with open(
+        MEMORY_FILE,
+        "r",
+        encoding="utf-8"
+    ) as file:
 
-    if user_id in users:
-
-        users[user_id]["messages"].append(message)
+        return json.load(file)
 
 
-def get_user(user_id):
 
-    return users.get(
-        user_id,
-        "User not found"
+def save_memory(name, message):
+
+    memory = load_memory()
+
+
+    if name not in memory:
+
+        memory[name] = {
+            "messages": []
+        }
+
+
+    memory[name]["messages"].append(
+        message
     )
+
+
+    with open(
+        MEMORY_FILE,
+        "w",
+        encoding="utf-8"
+    ) as file:
+
+        json.dump(
+            memory,
+            file,
+            indent=4
+        )
+
+
+    return memory[name]
+
+
+
+def get_memory(name):
+
+    memory = load_memory()
+
+
+    if name in memory:
+
+        return memory[name]
+
+
+    return {
+        "messages": []
+    }
 
 
 
 if __name__ == "__main__":
 
-    save_user(1, "Timilehin")
-
-    add_message(
-        1,
+    save_memory(
+        "Timilehin",
         "Building TimiFX AI"
     )
 
-    print(get_user(1))
+
+    print(
+        get_memory("Timilehin")
+    )

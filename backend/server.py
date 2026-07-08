@@ -1,79 +1,117 @@
-"""
-===========================================
-TimiFX AI Backend v2.1
-
-Backend + Memory Integration
-
-Author: Timilehin
-===========================================
-"""
-
-
 import sys
 import os
-from datetime import datetime
 
+# ==========================================
+# Add project root to Python path
+# ==========================================
 
-# Allow backend to access project folders
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
         os.path.abspath(__file__)
     )
 )
 
-sys.path.append(PROJECT_ROOT)
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
 
+# ==========================================
+# Imports
+# ==========================================
+
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from datetime import datetime
 
 from database.memory import (
-    save_user,
-    add_message,
-    get_user
+    save_memory,
+    get_memory
 )
 
+# ==========================================
+# Flask App
+# ==========================================
 
-def start_ai(user_id, name, message):
+app = Flask(__name__)
 
-    # Save user information
-    save_user(
-        user_id,
-        name
-    )
+CORS(app)
 
-    # Store message in memory
-    add_message(
-        user_id,
-        message
-    )
+# ==========================================
+# Home Route
+# ==========================================
 
-    return {
+@app.route("/", methods=["GET"])
+def home():
+
+    return jsonify({
 
         "project": "TimiFX AI",
 
         "status": "online",
 
-        "user": get_user(
-            user_id
-        ),
+        "message": "Welcome to TimiFX AI Core Engine",
 
-        "response":
-            "Message received and stored.",
+        "time": str(datetime.now())
 
-        "time":
-            str(datetime.now())
+    })
 
-    }
+# ==========================================
+# Chat Route
+# ==========================================
 
+@app.route("/chat", methods=["POST"])
+def chat():
+
+    data = request.get_json()
+
+    user_message = data.get("message", "").strip()
+
+    if user_message == "":
+
+        return jsonify({
+
+            "response": "Please type a message."
+
+        })
+
+    # Save message into memory
+    save_memory(
+        "Timilehin",
+        user_message
+    )
+
+    # Read memory
+    memory = get_memory("Timilehin")
+
+    # AI reply
+    ai_reply = (
+        f"You said: '{user_message}'. "
+        "Your message has been saved into memory."
+    )
+
+    return jsonify({
+
+        "response": ai_reply,
+
+        "memory": memory,
+
+        "time": str(datetime.now())
+
+    })
+
+# ==========================================
+# Run Server
+# ==========================================
 
 if __name__ == "__main__":
 
-    result = start_ai(
+    print("🚀 TimiFX AI Backend Running...")
 
-        1,
+    app.run(
 
-        "Timilehin",
+        host="0.0.0.0",
 
-        "Building TimiFX AI"
+        port=5000,
+
+        debug=True
 
     )
-
-    print(result)
