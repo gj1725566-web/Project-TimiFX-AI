@@ -21,3 +21,6 @@ venv/
 
 # Temporary Files
 *.tmp
+
+# Memory database
+database/memory.json
