@@ -1,28 +1,59 @@
-/* ===========================================
-   TimiFX AI Website v2.0
-   Frontend Backend Connection
-   Author: Timilehin
-=========================================== */
+/*
+===========================================
+TimiFX AI Website Chat Engine v2.0
+Author: Timilehin
+===========================================
+*/
 
-
-const sendButton = document.getElementById("sendBtn");
-
-const userMessage = document.getElementById("userMessage");
 
 const chatBox = document.getElementById("chatBox");
+const userMessage = document.getElementById("userMessage");
+const sendBtn = document.getElementById("sendBtn");
+
+
+
+// Add message to chat window
+
+function addMessage(message, sender) {
+
+
+    const messageDiv = document.createElement("div");
+
+
+    messageDiv.classList.add(
+        "message",
+        sender
+    );
+
+
+    messageDiv.innerText = message;
+
+
+    chatBox.appendChild(
+        messageDiv
+    );
+
+
+    chatBox.scrollTop =
+        chatBox.scrollHeight;
+
+}
 
 
 
 
 
-sendButton.addEventListener("click", async function(){
+// Send message to TimiFX AI
+
+async function sendMessage() {
 
 
-    const message = userMessage.value.trim();
+    const message =
+        userMessage.value.trim();
 
 
 
-    if(message === ""){
+    if(message === "") {
 
         return;
 
@@ -30,16 +61,10 @@ sendButton.addEventListener("click", async function(){
 
 
 
-
-    // Show user's message
-
-    const userText = document.createElement("p");
-
-    userText.innerHTML = "You: " + message;
-
-    chatBox.appendChild(userText);
-
-
+    addMessage(
+        message,
+        "user"
+    );
 
 
 
@@ -47,55 +72,67 @@ sendButton.addEventListener("click", async function(){
 
 
 
+    addMessage(
+        "TimiFX AI is thinking...",
+        "ai"
+    );
+
 
 
     try {
 
 
-        const response = await fetch(
+        const response =
+        await fetch(
             "http://127.0.0.1:5000/chat",
             {
 
-                method:"POST",
 
-                headers:{
+                method:
+                "POST",
 
-                    "Content-Type":"application/json"
+
+                headers:
+                {
+
+                    "Content-Type":
+                    "application/json"
 
                 },
 
 
-                body:JSON.stringify({
+                body:
+                JSON.stringify({
 
-                    message:message
+                    message:
+                    message
 
                 })
 
-
             }
+
         );
 
 
 
-
-
-        const data = await response.json();
-
-
+        const data =
+        await response.json();
 
 
 
-        const aiText = document.createElement("p");
+        // Remove thinking message
 
-
-        aiText.innerHTML = 
-        "🤖 TimiFX AI: " + data.response;
-
+        chatBox.lastChild.remove();
 
 
 
-        chatBox.appendChild(aiText);
+        addMessage(
 
+            data.ai_response,
+
+            "ai"
+
+        );
 
 
 
@@ -103,25 +140,64 @@ sendButton.addEventListener("click", async function(){
 
 
 
-    catch(error){
-
-
-        const errorText = document.createElement("p");
-
-
-        errorText.innerHTML =
-        "❌ Connection error. Backend is not responding.";
-
-
-        chatBox.appendChild(errorText);
+    catch(error) {
 
 
 
-        console.log(error);
+        chatBox.lastChild.remove();
+
+
+
+        addMessage(
+
+            "Connection error. Make sure TimiFX AI backend is running.",
+
+            "ai"
+
+        );
+
+
+        console.error(
+            error
+        );
 
 
     }
 
 
+}
 
-});
+
+
+
+// Button click
+
+sendBtn.addEventListener(
+    "click",
+    sendMessage
+);
+
+
+
+
+// Enter key support
+
+userMessage.addEventListener(
+
+    "keypress",
+
+    function(event){
+
+
+        if(event.key === "Enter") {
+
+
+            sendMessage();
+
+
+        }
+
+
+    }
+
+);
