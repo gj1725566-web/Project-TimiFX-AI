@@ -1,22 +1,23 @@
 """
 ===========================================
-TimiFX AI Memory Retriever Engine
-Phase 14 - Long Term Memory System
+TimiFX AI Smart Memory Retrieval Engine
+Phase 14.2 - Memory Ranking System
 Author: Timilehin
 ===========================================
 
-Purpose:
-Search stored memories and return useful
-information for the AI brain.
+Features:
+- Keyword extraction
+- Memory searching
+- Memory scoring
+- Relevant memory ranking
 ===========================================
 """
 
 
 import sys
 import os
+import re
 
-
-# Add project root to Python path
 
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
@@ -45,22 +46,108 @@ from brain.profile import (
 
 
 
+
+def extract_keywords(text):
+
+    """
+    Extract important words from a message.
+    """
+
+
+    words = re.findall(
+        r"\b[a-zA-Z]+\b",
+        text.lower()
+    )
+
+
+    ignored_words = [
+
+        "what",
+        "who",
+        "where",
+        "when",
+        "how",
+        "do",
+        "does",
+        "is",
+        "are",
+        "my",
+        "your",
+        "the",
+        "a",
+        "an",
+        "i",
+        "you"
+
+    ]
+
+
+    keywords = [
+
+        word
+
+        for word in words
+
+        if word not in ignored_words
+
+    ]
+
+
+    return keywords
+
+
+
+
+
+def calculate_score(
+    memory_text,
+    keywords
+):
+
+    """
+    Score memory relevance.
+    """
+
+
+    score = 0
+
+
+    text = memory_text.lower()
+
+
+    for keyword in keywords:
+
+
+        if keyword in text:
+
+            score += 1
+
+
+
+    return score
+
+
+
+
+
+
+
 def search_memory(
     query,
     user_name="Timilehin"
 ):
 
-    """
-    Search user's stored memories.
-    """
 
-    query = query.lower()
-
-
-    results = []
+    keywords = extract_keywords(
+        query
+    )
 
 
-    # 1. Search conversation history
+    memories = []
+
+
+
+    # Search conversation memory
 
     conversations = get_conversation_history(
         user_name
@@ -69,50 +156,101 @@ def search_memory(
 
     for item in conversations:
 
+
         content = item.get(
             "content",
             ""
         )
 
 
-        if query in content.lower():
+        score = calculate_score(
 
-            results.append(
+            content,
+
+            keywords
+
+        )
+
+
+        if score > 0:
+
+
+            memories.append(
+
                 {
+
                     "type": "conversation",
-                    "content": content
+
+                    "content": content,
+
+                    "score": score
+
                 }
+
             )
 
 
 
-    # 2. Search user profile
+
+
+
+    # Search profile memory
+
 
     profile = load_profile()
 
 
     profile_text = str(
         profile
-    ).lower()
+    )
+
+
+    score = calculate_score(
+
+        profile_text,
+
+        keywords
+
+    )
+
+
+    if score > 0:
+
+
+        memories.append(
+
+            {
+
+                "type": "profile",
+
+                "content": profile,
+
+                "score": score
+
+            }
+
+        )
 
 
 
-    for word in query.split():
-
-        if word in profile_text:
-
-            results.append(
-                {
-                    "type": "profile",
-                    "content": profile
-                }
-            )
-
-            break
 
 
 
-    return results
+    # Sort highest relevance first
+
+
+    memories.sort(
+
+        key=lambda x: x["score"],
+
+        reverse=True
+
+    )
+
+
+
+    return memories
+
 
 
 
@@ -122,40 +260,47 @@ def get_memory_context(
     query
 ):
 
-    """
-    Convert memories into AI readable context.
-    """
-
 
     memories = search_memory(
         query
     )
 
 
+
     if not memories:
 
+
         return (
-            "No previous memory found."
+            "No relevant memory found."
         )
 
 
 
     context = """
 
-Relevant previous memories:
+Relevant memories from previous interactions:
 
 """
 
 
-    for memory in memories:
+
+    for memory in memories[:5]:
 
 
         context += (
-            f"\n- {memory}\n"
+
+            f"\nMemory type: {memory['type']}"
+
+            f"\nRelevance score: {memory['score']}"
+
+            f"\nInformation: {memory['content']}\n"
+
         )
 
 
+
     return context
+
 
 
 
@@ -165,7 +310,9 @@ if __name__ == "__main__":
 
 
     result = search_memory(
-        "Python"
+
+        "What programming language do I like?"
+
     )
 
 

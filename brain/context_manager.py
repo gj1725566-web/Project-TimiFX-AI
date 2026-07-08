@@ -1,8 +1,15 @@
 """
 ===========================================
 TimiFX AI Context Manager
-Phase 13 - Memory Integration Layer
+Phase 15 - Adaptive Memory Integration
 Author: Timilehin
+===========================================
+
+Responsibilities:
+- Filter user memory
+- Extract useful information
+- Update user profile
+- Ignore temporary information
 ===========================================
 """
 
@@ -26,49 +33,74 @@ if PROJECT_ROOT not in sys.path:
     )
 
 
-
+from brain.memory_filter import filter_memory
 from brain.memory_extractor import extract_memory
-from brain.profile import update_profile, load_profile
-
-
+from brain.profile import (
+    update_profile,
+    load_profile
+)
 
 
 def process_user_memory(message):
-
     """
-    Extract useful information
-    and update user profile.
+    Main long-term memory pipeline.
     """
 
+    # -----------------------------
+    # Step 1: Decide whether this
+    # message should be remembered.
+    # -----------------------------
 
-    extracted_memory = extract_memory(
-        message
+    decision = filter_memory(message)
+
+    if not decision["important"]:
+
+        return load_profile()
+
+    # -----------------------------
+    # Step 2: Extract structured
+    # memory from the message.
+    # -----------------------------
+
+    extracted_memory = extract_memory(message)
+
+    if not extracted_memory:
+
+        extracted_memory = decision["memory"]
+
+    # -----------------------------
+    # Step 3: Save into profile.
+    # -----------------------------
+
+    profile = update_profile(
+        extracted_memory
     )
 
-
-    if extracted_memory:
-
-        profile = update_profile(
-            extracted_memory
-        )
-
-        return profile
-
-
-
-    return load_profile()
-
-
+    return profile
 
 
 if __name__ == "__main__":
 
+    tests = [
 
-    result = process_user_memory(
+        "I prefer Python for AI development",
 
-        "I love Python and I want to build AI tools"
+        "I want to build AI tools",
 
-    )
+        "I ate rice today"
 
+    ]
 
-    print(result)
+    for test in tests:
+
+        print("=" * 60)
+        print("Message:")
+        print(test)
+
+        print("\nUpdated Profile:")
+
+        print(
+            process_user_memory(
+                test
+            )
+        )

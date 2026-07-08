@@ -11,6 +11,7 @@
     "interests": {},
     "skills": {},
     "goals": {
-        "current_interest": "I love Python and I want to build AI tools"
+        "current_interest": "I want to build AI tools",
+        "information": "What do you know about my goals?"
     }
 }
