@@ -12,6 +12,7 @@ PROJECT_ROOT = os.path.dirname(
 sys.path.append(PROJECT_ROOT)
 
 
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
@@ -20,8 +21,8 @@ from groq import Groq
 
 
 from database.memory import (
-    save_memory,
-    get_memory
+    save_conversation,
+    get_conversation_history
 )
 
 
@@ -30,22 +31,13 @@ from database.memory import (
 load_dotenv()
 
 
-# Get Groq API Key
+
 GROQ_API_KEY = os.getenv(
     "GROQ_API_KEY"
 )
 
 
-# Check API key
-if not GROQ_API_KEY:
 
-    raise ValueError(
-        "GROQ_API_KEY missing. Check your .env file."
-    )
-
-
-
-# Create Groq client
 client = Groq(
     api_key=GROQ_API_KEY
 )
@@ -58,32 +50,21 @@ CORS(app)
 
 
 
-# ==========================
-# HOME ROUTE
-# ==========================
 
 @app.route("/", methods=["GET"])
 def home():
 
     return jsonify({
 
-        "project":
-        "TimiFX AI",
+        "project": "TimiFX AI",
 
-        "status":
-        "online",
+        "status": "online",
 
-        "message":
-        "Welcome to TimiFX AI Core Engine",
+        "ai_engine": "Groq",
 
-        "ai_engine":
-        "Groq",
+        "memory": "Conversation Memory Active",
 
-        "memory":
-        "Active",
-
-        "time":
-        str(datetime.now())
+        "time": str(datetime.now())
 
     })
 
@@ -91,13 +72,8 @@ def home():
 
 
 
-# ==========================
-# CHAT ROUTE
-# ==========================
-
 @app.route("/chat", methods=["POST"])
 def chat():
-
 
     data = request.json
 
@@ -108,107 +84,75 @@ def chat():
     )
 
 
-    if user_message == "":
 
-        return jsonify({
-
-            "error":
-            "Message cannot be empty"
-
-        })
+    # Load previous conversation
+    history = get_conversation_history(
+        "Timilehin"
+    )
 
 
 
-    # Save user memory
+    messages = [
 
-    save_memory(
+        {
+            "role": "system",
 
-        "Timilehin",
+            "content":
+            """
+You are TimiFX AI.
 
-        user_message
+You are an intelligent personal AI assistant.
+
+Founder:
+Timilehin
+
+Project:
+Project-TimiFX-AI
+
+Personality:
+Helpful,
+professional,
+creative,
+friendly.
+
+Remember previous conversations
+when answering.
+"""
+        }
+
+    ]
+
+
+
+    # Add previous memory
+    messages.extend(history)
+
+
+
+    # Add current user message
+    messages.append(
+
+        {
+
+            "role": "user",
+
+            "content": user_message
+
+        }
 
     )
+
 
 
 
     try:
 
 
-        memory = get_memory(
-            "Timilehin"
-        )
-
-
-
         response = client.chat.completions.create(
 
+            model="llama-3.3-70b-versatile",
 
-            model=
-            "llama-3.3-70b-versatile",
-
-
-            messages=[
-
-
-                {
-
-                    "role":
-                    "system",
-
-
-                    "content":
-                    """
-You are TimiFX AI.
-
-Your identity:
-
-- Your name is TimiFX AI.
-- You are Timilehin's personal AI assistant.
-- You help with technology, programming,
-  business ideas, automation, AI projects,
-  learning, and productivity.
-
-Personality:
-
-- Friendly
-- Professional
-- Intelligent
-- Encouraging
-- Clear and detailed
-
-Important:
-
-Remember that Timilehin is your founder
-and creator.
-
-The current project is:
-Project-TimiFX-AI.
-
-You should always behave like a
-professional AI assistant built for
-this project.
-
-Previous memory:
-
-"""
-+
-str(memory)
-
-                },
-
-
-                {
-
-                    "role":
-                    "user",
-
-
-                    "content":
-                    user_message
-
-                }
-
-            ]
+            messages=messages
 
         )
 
@@ -225,13 +169,13 @@ str(memory)
 
 
 
-
     except Exception as error:
 
 
         ai_reply = (
 
-            "TimiFX AI encountered an error: "
+            "TimiFX AI Error: "
+
             + str(error)
 
         )
@@ -240,19 +184,39 @@ str(memory)
 
 
 
+    # Save user message
+    save_conversation(
+
+        "Timilehin",
+
+        "user",
+
+        user_message
+
+    )
+
+
+
+    # Save AI response
+    save_conversation(
+
+        "Timilehin",
+
+        "assistant",
+
+        ai_reply
+
+    )
+
+
+
+
+
     return jsonify({
-
-
-        "project":
-
-        "TimiFX AI",
-
-
 
         "user_message":
 
         user_message,
-
 
 
         "ai_response":
@@ -260,13 +224,13 @@ str(memory)
         ai_reply,
 
 
-
         "memory":
 
-        get_memory(
-            "Timilehin"
-        ),
+        get_conversation_history(
 
+            "Timilehin"
+
+        ),
 
 
         "time":
@@ -280,11 +244,6 @@ str(memory)
 
 
 
-# ==========================
-# START SERVER
-# ==========================
-
-
 if __name__ == "__main__":
 
 
@@ -294,14 +253,8 @@ if __name__ == "__main__":
 
 
     print(
-        "🧠 Groq Intelligence Online"
+        "🧠 Groq + Memory System Connected"
     )
-
-
-    print(
-        "💾 Memory System Connected"
-    )
-
 
 
     app.run(
