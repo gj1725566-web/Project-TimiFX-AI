@@ -1,7 +1,6 @@
 import sys
 import os
 
-
 # Add project root directory to Python path
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
@@ -9,46 +8,23 @@ PROJECT_ROOT = os.path.dirname(
     )
 )
 
-sys.path.append(PROJECT_ROOT)
-
-
+if PROJECT_ROOT not in sys.path:
+    sys.path.append(PROJECT_ROOT)
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
-from dotenv import load_dotenv
-from groq import Groq
 
+from backend.ai_engine import generate_response
 
 from database.memory import (
     save_conversation,
     get_conversation_history
 )
 
-
-
-# Load environment variables
-load_dotenv()
-
-
-
-GROQ_API_KEY = os.getenv(
-    "GROQ_API_KEY"
-)
-
-
-
-client = Groq(
-    api_key=GROQ_API_KEY
-)
-
-
-
 app = Flask(__name__)
 
 CORS(app)
-
-
 
 
 @app.route("/", methods=["GET"])
@@ -64,127 +40,74 @@ def home():
 
         "memory": "Conversation Memory Active",
 
+        "version": "Phase 8",
+
         "time": str(datetime.now())
 
     })
 
 
-
-
-
 @app.route("/chat", methods=["POST"])
 def chat():
 
-    data = request.json
+    data = request.get_json()
+
+    if not data:
+
+        return jsonify({
+
+            "error": "No JSON received."
+
+        }), 400
 
 
     user_message = data.get(
         "message",
         ""
-    )
+    ).strip()
 
+
+    if not user_message:
+
+        return jsonify({
+
+            "error": "Message cannot be empty."
+
+        }), 400
 
 
     # Load previous conversation
-    history = get_conversation_history(
+    conversation = get_conversation_history(
         "Timilehin"
     )
 
 
+    # Add newest user message
+    conversation.append({
 
-    messages = [
+        "role": "user",
 
-        {
-            "role": "system",
+        "content": user_message
 
-            "content":
-            """
-You are TimiFX AI.
-
-You are an intelligent personal AI assistant.
-
-Founder:
-Timilehin
-
-Project:
-Project-TimiFX-AI
-
-Personality:
-Helpful,
-professional,
-creative,
-friendly.
-
-Remember previous conversations
-when answering.
-"""
-        }
-
-    ]
-
-
-
-    # Add previous memory
-    messages.extend(history)
-
-
-
-    # Add current user message
-    messages.append(
-
-        {
-
-            "role": "user",
-
-            "content": user_message
-
-        }
-
-    )
-
-
+    })
 
 
     try:
 
-
-        response = client.chat.completions.create(
-
-            model="llama-3.3-70b-versatile",
-
-            messages=messages
-
+        ai_reply = generate_response(
+            conversation
         )
-
-
-
-        ai_reply = (
-
-            response
-            .choices[0]
-            .message
-            .content
-
-        )
-
-
 
     except Exception as error:
 
+        return jsonify({
 
-        ai_reply = (
+            "error": str(error)
 
-            "TimiFX AI Error: "
-
-            + str(error)
-
-        )
+        }), 500
 
 
-
-
-
-    # Save user message
+    # Save conversation
     save_conversation(
 
         "Timilehin",
@@ -195,9 +118,6 @@ when answering.
 
     )
 
-
-
-    # Save AI response
     save_conversation(
 
         "Timilehin",
@@ -209,53 +129,32 @@ when answering.
     )
 
 
-
-
-
     return jsonify({
 
-        "user_message":
+        "user_message": user_message,
 
-        user_message,
+        "ai_response": ai_reply,
 
-
-        "ai_response":
-
-        ai_reply,
-
-
-        "memory":
-
-        get_conversation_history(
-
-            "Timilehin"
-
+        "memory_count": len(
+            get_conversation_history(
+                "Timilehin"
+            )
         ),
 
-
-        "time":
-
-        str(datetime.now())
+        "time": str(
+            datetime.now()
+        )
 
     })
 
 
-
-
-
-
 if __name__ == "__main__":
 
+    print("🚀 TimiFX AI Backend Running...")
 
-    print(
-        "🚀 TimiFX AI Backend Running..."
-    )
+    print("🧠 AI Engine Loaded")
 
-
-    print(
-        "🧠 Groq + Memory System Connected"
-    )
-
+    print("💾 Memory System Loaded")
 
     app.run(
 
