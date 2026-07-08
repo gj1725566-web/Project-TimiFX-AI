@@ -2,7 +2,7 @@
 ===========================================
 TimiFX AI Intelligence Pipeline
 Author: Timilehin
-Version: 1.3
+Version: 1.4
 
 Connects:
 - Reasoning Engine
@@ -12,6 +12,7 @@ Connects:
 - Memory Extractor
 - Context Manager
 - User Profile Engine
+- Long-Term Memory Retrieval
 - AI Engine
 ===========================================
 """
@@ -20,6 +21,8 @@ Connects:
 import sys
 import os
 
+
+# Add project root to Python path
 
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
@@ -38,27 +41,39 @@ if PROJECT_ROOT not in sys.path:
 
 from brain.reasoning import analyze_intent
 
+
 from brain.planner import create_plan
+
 
 from brain.context_manager import (
     process_user_memory
 )
 
+
 from brain.profile import (
     load_profile
 )
+
+
+from brain.memory_retriever import (
+    get_memory_context
+)
+
 
 from database.memory import (
     get_conversation_history
 )
 
+
 from database.knowledge import (
     get_knowledge
 )
 
+
 from backend.ai_engine import (
     generate_response
 )
+
 
 
 
@@ -71,7 +86,9 @@ def run_pipeline(
 ):
 
 
-    # 1. Understand request
+    # =====================================
+    # 1. Understand user intention
+    # =====================================
 
     reasoning = analyze_intent(
         user_message
@@ -81,7 +98,9 @@ def run_pipeline(
 
 
 
-    # 2. Learn from message
+    # =====================================
+    # 2. Learn from current message
+    # =====================================
 
     process_user_memory(
         user_message
@@ -98,14 +117,31 @@ def run_pipeline(
 
 
 
-    # 3. Load conversation memory
+    # =====================================
+    # 3. Retrieve long-term memories
+    # =====================================
 
-    memory = []
+    memory_context = get_memory_context(
+        user_message
+    )
+
+
+
+
+
+
+
+    # =====================================
+    # 4. Load conversation history
+    # =====================================
+
+    conversation_memory = []
 
 
     if reasoning["use_memory"]:
 
-        memory = get_conversation_history(
+
+        conversation_memory = get_conversation_history(
             user_name
         )
 
@@ -115,12 +151,16 @@ def run_pipeline(
 
 
 
-    # 4. Load knowledge
+
+    # =====================================
+    # 5. Load knowledge database
+    # =====================================
 
     knowledge = {}
 
 
     if reasoning["use_knowledge"]:
+
 
         knowledge = get_knowledge()
 
@@ -129,7 +169,10 @@ def run_pipeline(
 
 
 
-    # 5. Create plan
+
+    # =====================================
+    # 6. Create task plan
+    # =====================================
 
     plan = None
 
@@ -153,14 +196,35 @@ def run_pipeline(
 
 
 
-    # 6. Build conversation
+
+    # =====================================
+    # 7. Build AI conversation context
+    # =====================================
 
     conversation = []
 
 
+
     conversation.extend(
-        memory
+        conversation_memory
     )
+
+
+
+
+    conversation.append(
+
+        {
+
+            "role": "system",
+
+            "content": memory_context
+
+        }
+
+    )
+
+
 
 
 
@@ -182,7 +246,10 @@ def run_pipeline(
 
 
 
-    # 7. Generate answer
+
+    # =====================================
+    # 8. Generate AI response
+    # =====================================
 
     response = generate_response(
         conversation
@@ -193,6 +260,11 @@ def run_pipeline(
 
 
 
+
+
+    # =====================================
+    # 9. Return complete intelligence data
+    # =====================================
 
     return {
 
@@ -227,6 +299,12 @@ def run_pipeline(
 
 
 
+        "memory_context":
+
+            memory_context,
+
+
+
         "memory_used":
 
             reasoning["use_memory"]
@@ -237,12 +315,14 @@ def run_pipeline(
 
 
 
+
+
 if __name__ == "__main__":
 
 
     result = run_pipeline(
 
-        "I love Python and I want to build AI tools"
+        "What do you know about my goals?"
 
     )
 
