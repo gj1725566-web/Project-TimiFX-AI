@@ -1,9 +1,17 @@
+"""
+===========================================
+TimiFX AI Backend Server
+Phase 12 - Full Brain Pipeline Integration
+Author: Timilehin
+===========================================
+"""
+
+
 import sys
 import os
 
-# ===========================================
-# Add Project Root
-# ===========================================
+
+# Add project root directory to Python path
 
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
@@ -11,21 +19,25 @@ PROJECT_ROOT = os.path.dirname(
     )
 )
 
+
 if PROJECT_ROOT not in sys.path:
-    sys.path.append(PROJECT_ROOT)
+
+    sys.path.append(
+        PROJECT_ROOT
+    )
 
 
-# ===========================================
-# Imports
-# ===========================================
 
 from flask import Flask, request, jsonify
+
 from flask_cors import CORS
+
 from datetime import datetime
 
-from backend.ai_engine import generate_response
 
-from brain.reasoning import analyze_intent
+
+from brain.pipeline import run_pipeline
+
 
 from database.memory import (
     save_conversation,
@@ -33,129 +45,143 @@ from database.memory import (
 )
 
 
-# ===========================================
-# Flask
-# ===========================================
 
 app = Flask(__name__)
+
 
 CORS(app)
 
 
-# ===========================================
-# Home
-# ===========================================
+
+
 
 @app.route("/", methods=["GET"])
 def home():
+
 
     return jsonify({
 
         "project": "TimiFX AI",
 
-        "version": "Phase 11",
-
         "status": "online",
 
-        "ai_engine": "Groq",
+        "brain": "Pipeline Active",
 
-        "reasoning": "Enabled",
+        "systems": [
 
-        "memory": "Conversation Memory Active",
+            "Reasoning Engine",
 
-        "time": str(datetime.now())
+            "Planning Engine",
+
+            "Knowledge Memory",
+
+            "Conversation Memory",
+
+            "AI Engine"
+
+        ],
+
+        "version": "Phase 12",
+
+        "time": str(
+            datetime.now()
+        )
 
     })
 
 
-# ===========================================
-# Chat
-# ===========================================
+
+
+
+
 
 @app.route("/chat", methods=["POST"])
 def chat():
 
+
     data = request.get_json()
+
+
 
     if not data:
 
+
         return jsonify({
 
-            "error": "No JSON received."
+            "error":
+            "No JSON received."
 
         }), 400
+
+
+
 
 
     user_message = data.get(
+
         "message",
+
         ""
+
     ).strip()
 
 
-    if user_message == "":
+
+
+
+    if not user_message:
+
 
         return jsonify({
 
-            "error": "Message cannot be empty."
+            "error":
+            "Message cannot be empty."
 
         }), 400
 
 
-    # =======================================
-    # Analyze User Intent
-    # =======================================
-
-    reasoning = analyze_intent(
-        user_message
-    )
 
 
-    # =======================================
-    # Load Memory
-    # =======================================
 
-    conversation = []
-
-    if reasoning["use_memory"]:
-
-        conversation = get_conversation_history(
-            "Timilehin"
-        )
-
-
-    # Add newest message
-
-    conversation.append({
-
-        "role": "user",
-
-        "content": user_message
-
-    })
-
-
-    # =======================================
-    # Generate AI Response
-    # =======================================
 
     try:
 
-        ai_reply = generate_response(
-            conversation
+
+        # Send message through full TimiFX brain pipeline
+
+        pipeline_result = run_pipeline(
+
+            user_message
+
         )
+
+
+
+        ai_reply = pipeline_result[
+
+            "response"
+
+        ]
+
+
 
     except Exception as error:
 
+
         return jsonify({
 
-            "error": str(error)
+            "error":
+            str(error)
 
         }), 500
 
 
-    # =======================================
-    # Save Memory
-    # =======================================
+
+
+
+
+    # Save conversation memory
+
 
     save_conversation(
 
@@ -166,6 +192,8 @@ def chat():
         user_message
 
     )
+
+
 
     save_conversation(
 
@@ -178,50 +206,136 @@ def chat():
     )
 
 
-    # =======================================
-    # Response
-    # =======================================
+
+
+
+
 
     return jsonify({
 
-        "user_message": user_message,
+        "user_message":
 
-        "intent": reasoning["intent"],
+            user_message,
 
-        "memory_used": reasoning["use_memory"],
 
-        "knowledge_used": reasoning["use_knowledge"],
 
-        "ai_response": ai_reply,
+        "ai_response":
 
-        "memory_count": len(
+            ai_reply,
 
-            get_conversation_history(
 
-                "Timilehin"
+
+        "reasoning":
+
+            pipeline_result.get(
+
+                "reasoning",
+
+                {}
+
+            ),
+
+
+
+        "plan":
+
+            pipeline_result.get(
+
+                "plan",
+
+                {}
+
+            ),
+
+
+
+        "knowledge_used":
+
+            pipeline_result.get(
+
+                "knowledge",
+
+                {}
+
+            ),
+
+
+
+        "memory_used":
+
+            pipeline_result.get(
+
+                "memory_used",
+
+                False
+
+            ),
+
+
+
+        "memory_count":
+
+            len(
+
+                get_conversation_history(
+
+                    "Timilehin"
+
+                )
+
+            ),
+
+
+
+        "time":
+
+            str(
+
+                datetime.now()
 
             )
-
-        ),
-
-        "time": str(datetime.now())
 
     })
 
 
-# ===========================================
-# Main
-# ===========================================
+
+
+
+
 
 if __name__ == "__main__":
 
-    print("🚀 TimiFX AI Backend Running...")
 
-    print("🧠 AI Engine Loaded")
+    print(
+        "🚀 TimiFX AI Backend Running..."
+    )
 
-    print("💾 Memory System Loaded")
 
-    print("🤔 Reasoning Engine Loaded")
+    print(
+        "🧠 AI Engine Loaded"
+    )
+
+
+    print(
+        "💾 Memory System Loaded"
+    )
+
+
+    print(
+        "🤔 Reasoning Engine Loaded"
+    )
+
+
+    print(
+        "📋 Planning Engine Loaded"
+    )
+
+
+    print(
+        "🔗 Full Brain Pipeline Connected"
+    )
+
+
 
     app.run(
 
