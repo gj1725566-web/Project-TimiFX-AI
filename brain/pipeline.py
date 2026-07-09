@@ -2,7 +2,7 @@
 ===========================================
 TimiFX AI Intelligence Pipeline
 Author: Timilehin
-Version: 1.4
+Version: 1.5
 
 Connects:
 - Reasoning Engine
@@ -13,6 +13,7 @@ Connects:
 - Context Manager
 - User Profile Engine
 - Long-Term Memory Retrieval
+- Identity Engine
 - AI Engine
 ===========================================
 """
@@ -22,8 +23,6 @@ import sys
 import os
 
 
-# Add project root to Python path
-
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
         os.path.abspath(__file__)
@@ -32,10 +31,7 @@ PROJECT_ROOT = os.path.dirname(
 
 
 if PROJECT_ROOT not in sys.path:
-
-    sys.path.append(
-        PROJECT_ROOT
-    )
+    sys.path.append(PROJECT_ROOT)
 
 
 
@@ -57,6 +53,12 @@ from brain.profile import (
 
 from brain.memory_retriever import (
     get_memory_context
+)
+
+
+from brain.identity import (
+    get_identity,
+    identity_message
 )
 
 
@@ -87,7 +89,7 @@ def run_pipeline(
 
 
     # =====================================
-    # 1. Understand user intention
+    # 1. Understand intention
     # =====================================
 
     reasoning = analyze_intent(
@@ -99,7 +101,7 @@ def run_pipeline(
 
 
     # =====================================
-    # 2. Learn from current message
+    # 2. Learn from user message
     # =====================================
 
     process_user_memory(
@@ -107,10 +109,20 @@ def run_pipeline(
     )
 
 
-
-    # Reload updated profile
-
     profile = load_profile()
+
+
+
+
+
+    # =====================================
+    # 3. Load identity
+    # =====================================
+
+    identity = get_identity()
+
+
+    identity_context = identity_message()
 
 
 
@@ -118,7 +130,7 @@ def run_pipeline(
 
 
     # =====================================
-    # 3. Retrieve long-term memories
+    # 4. Retrieve long-term memories
     # =====================================
 
     memory_context = get_memory_context(
@@ -130,16 +142,14 @@ def run_pipeline(
 
 
 
-
     # =====================================
-    # 4. Load conversation history
+    # 5. Load conversation history
     # =====================================
 
     conversation_memory = []
 
 
     if reasoning["use_memory"]:
-
 
         conversation_memory = get_conversation_history(
             user_name
@@ -150,17 +160,14 @@ def run_pipeline(
 
 
 
-
-
     # =====================================
-    # 5. Load knowledge database
+    # 6. Load knowledge
     # =====================================
 
     knowledge = {}
 
 
     if reasoning["use_knowledge"]:
-
 
         knowledge = get_knowledge()
 
@@ -171,7 +178,7 @@ def run_pipeline(
 
 
     # =====================================
-    # 6. Create task plan
+    # 7. Create plan
     # =====================================
 
     plan = None
@@ -196,9 +203,8 @@ def run_pipeline(
 
 
 
-
     # =====================================
-    # 7. Build AI conversation context
+    # 8. Build AI context
     # =====================================
 
     conversation = []
@@ -208,6 +214,23 @@ def run_pipeline(
     conversation.extend(
         conversation_memory
     )
+
+
+
+
+
+    conversation.append(
+
+        {
+
+            "role": "system",
+
+            "content": identity_context
+
+        }
+
+    )
+
 
 
 
@@ -223,6 +246,7 @@ def run_pipeline(
         }
 
     )
+
 
 
 
@@ -248,7 +272,7 @@ def run_pipeline(
 
 
     # =====================================
-    # 8. Generate AI response
+    # 9. Generate response
     # =====================================
 
     response = generate_response(
@@ -263,7 +287,7 @@ def run_pipeline(
 
 
     # =====================================
-    # 9. Return complete intelligence data
+    # 10. Return intelligence package
     # =====================================
 
     return {
@@ -299,6 +323,12 @@ def run_pipeline(
 
 
 
+        "identity":
+
+            identity,
+
+
+
         "memory_context":
 
             memory_context,
@@ -317,12 +347,14 @@ def run_pipeline(
 
 
 
+
+
 if __name__ == "__main__":
 
 
     result = run_pipeline(
 
-        "What do you know about my goals?"
+        "Who are you?"
 
     )
 
