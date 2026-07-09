@@ -1,14 +1,22 @@
 """
 ===========================================
-TimiFX AI Emotion Engine
-Phase 18 - Emotional Intelligence Layer
+TimiFX AI Emotion Intelligence Engine
 
 Author: Timilehin
+
+Purpose:
+Detect user emotions and provide response guidance.
 ===========================================
 """
 
 
-EMOTION_PATTERNS = {
+# ===========================================
+# Emotion keyword database
+# ===========================================
+
+
+EMOTION_KEYWORDS = {
+
 
     "happy": [
 
@@ -18,12 +26,11 @@ EMOTION_PATTERNS = {
         "amazing",
         "awesome",
         "love",
-        "enjoy",
-        "proud",
-        "fantastic",
-        "wonderful"
+        "wonderful",
+        "proud"
 
     ],
+
 
 
     "sad": [
@@ -33,10 +40,10 @@ EMOTION_PATTERNS = {
         "depressed",
         "lonely",
         "hurt",
-        "cry",
-        "disappointed"
+        "cry"
 
     ],
+
 
 
     "confused": [
@@ -45,23 +52,36 @@ EMOTION_PATTERNS = {
         "don't understand",
         "unclear",
         "lost",
-        "help me understand"
+        "stuck"
 
     ],
 
 
-    "frustrated": [
 
-        "frustrated",
-        "frustrating",
-        "annoyed",
+   "frustrated": [
+
+    "frustrated",
+    "frustrating",
+    "frustration",
+    "annoyed",
+    "annoying",
+    "difficult",
+    "problem",
+    "issue",
+    "not working",
+    "stressful",
+    "stuck"
+
+],
+
+
+
+    "angry": [
+
         "angry",
-        "stress",
-        "stressed",
-        "overwhelmed",
-        "tired",
-        "difficult",
-        "hard"
+        "mad",
+        "hate",
+        "furious"
 
     ]
 
@@ -70,24 +90,29 @@ EMOTION_PATTERNS = {
 
 
 
+# ===========================================
+# Detect emotion
+# ===========================================
+
 
 def detect_emotion(message):
 
-    """
-    Analyze user emotional state.
-    """
 
     text = message.lower()
+
 
 
     detected = []
 
 
-    for emotion, words in EMOTION_PATTERNS.items():
 
-        for word in words:
+    for emotion, keywords in EMOTION_KEYWORDS.items():
 
-            if word in text:
+
+        for keyword in keywords:
+
+
+            if keyword in text:
 
                 detected.append(
                     emotion
@@ -97,7 +122,10 @@ def detect_emotion(message):
 
 
 
-    if not detected:
+
+
+    if len(detected) == 0:
+
 
         return {
 
@@ -111,16 +139,23 @@ def detect_emotion(message):
 
 
 
+
+
     primary = detected[0]
+
 
 
     return {
 
+
         "emotion": primary,
+
 
         "confidence": "high",
 
+
         "all_detected": detected
+
 
     }
 
@@ -128,41 +163,70 @@ def detect_emotion(message):
 
 
 
+# ===========================================
+# Convert emotion into AI behavior
+# ===========================================
 
 
-def emotion_response_style(emotion):
+def emotion_instruction(emotion_data):
 
 
-    styles = {
+    emotion = emotion_data.get(
+
+        "emotion",
+
+        "neutral"
+
+    )
+
+
+
+    instructions = {
 
 
         "happy":
-        "Respond positively and celebrate the user's excitement.",
+
+        "Respond positively, celebrate the user's excitement, and maintain an encouraging tone.",
+
 
 
         "sad":
+
         "Respond with empathy, patience, and encouragement.",
 
 
+
         "confused":
+
         "Explain clearly and step-by-step.",
 
 
+
         "frustrated":
+
         "Respond calmly, acknowledge difficulty, and provide supportive guidance.",
 
 
+
+        "angry":
+
+        "Remain calm, respectful, and avoid escalating the situation.",
+
+
+
         "neutral":
+
         "Respond normally."
 
     }
 
 
-    return styles.get(
+
+    return instructions.get(
 
         emotion,
 
-        "Respond normally."
+        instructions["neutral"]
 
     )
 
@@ -171,30 +235,38 @@ def emotion_response_style(emotion):
 
 
 
+# ===========================================
+# Test
+# ===========================================
 
 
 if __name__ == "__main__":
 
 
-    print("="*50)
+    print("=" * 50)
 
     print(
         "TimiFX AI Emotion Engine Test"
     )
 
-    print("="*50)
+    print("=" * 50)
 
 
 
-    tests = [
+    test_messages = [
+
 
         "I am so excited about building AI tools",
 
+
         "I feel sad today",
+
 
         "I am confused about Python",
 
+
         "This project is frustrating",
+
 
         "Hello how are you"
 
@@ -202,7 +274,8 @@ if __name__ == "__main__":
 
 
 
-    for message in tests:
+
+    for message in test_messages:
 
 
         result = detect_emotion(
@@ -224,7 +297,5 @@ if __name__ == "__main__":
 
 
         print(
-            emotion_response_style(
-                result["emotion"]
-            )
+            emotion_instruction(result)
         )
