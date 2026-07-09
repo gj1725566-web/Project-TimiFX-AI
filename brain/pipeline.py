@@ -2,7 +2,7 @@
 ===========================================
 TimiFX AI Intelligence Pipeline
 Author: Timilehin
-Version: 1.5
+Version: 1.6
 
 Connects:
 - Reasoning Engine
@@ -14,6 +14,7 @@ Connects:
 - User Profile Engine
 - Long-Term Memory Retrieval
 - Identity Engine
+- Personality Engine
 - AI Engine
 ===========================================
 """
@@ -32,6 +33,8 @@ PROJECT_ROOT = os.path.dirname(
 
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
+
+
 
 
 
@@ -62,6 +65,12 @@ from brain.identity import (
 )
 
 
+from brain.personality_engine import (
+    get_personality,
+    personality_message
+)
+
+
 from database.memory import (
     get_conversation_history
 )
@@ -75,6 +84,9 @@ from database.knowledge import (
 from backend.ai_engine import (
     generate_response
 )
+
+
+
 
 
 
@@ -116,7 +128,7 @@ def run_pipeline(
 
 
     # =====================================
-    # 3. Load identity
+    # 3. Load identity system
     # =====================================
 
     identity = get_identity()
@@ -129,8 +141,24 @@ def run_pipeline(
 
 
 
+
     # =====================================
-    # 4. Retrieve long-term memories
+    # 4. Load personality system
+    # =====================================
+
+    personality = get_personality()
+
+
+    personality_context = personality_message()
+
+
+
+
+
+
+
+    # =====================================
+    # 5. Retrieve memories
     # =====================================
 
     memory_context = get_memory_context(
@@ -142,8 +170,9 @@ def run_pipeline(
 
 
 
+
     # =====================================
-    # 5. Load conversation history
+    # 6. Conversation history
     # =====================================
 
     conversation_memory = []
@@ -160,8 +189,10 @@ def run_pipeline(
 
 
 
+
+
     # =====================================
-    # 6. Load knowledge
+    # 7. Knowledge system
     # =====================================
 
     knowledge = {}
@@ -178,7 +209,7 @@ def run_pipeline(
 
 
     # =====================================
-    # 7. Create plan
+    # 8. Planning system
     # =====================================
 
     plan = None
@@ -203,8 +234,10 @@ def run_pipeline(
 
 
 
+
+
     # =====================================
-    # 8. Build AI context
+    # 9. Build AI context
     # =====================================
 
     conversation = []
@@ -214,6 +247,7 @@ def run_pipeline(
     conversation.extend(
         conversation_memory
     )
+
 
 
 
@@ -235,6 +269,26 @@ def run_pipeline(
 
 
 
+
+
+    conversation.append(
+
+        {
+
+            "role": "system",
+
+            "content": personality_context
+
+        }
+
+    )
+
+
+
+
+
+
+
     conversation.append(
 
         {
@@ -246,6 +300,8 @@ def run_pipeline(
         }
 
     )
+
+
 
 
 
@@ -271,8 +327,10 @@ def run_pipeline(
 
 
 
+
+
     # =====================================
-    # 9. Generate response
+    # 10. Generate response
     # =====================================
 
     response = generate_response(
@@ -286,8 +344,9 @@ def run_pipeline(
 
 
 
+
     # =====================================
-    # 10. Return intelligence package
+    # 11. Return complete intelligence
     # =====================================
 
     return {
@@ -329,6 +388,12 @@ def run_pipeline(
 
 
 
+        "personality":
+
+            personality,
+
+
+
         "memory_context":
 
             memory_context,
@@ -349,12 +414,16 @@ def run_pipeline(
 
 
 
+
+
+
+
 if __name__ == "__main__":
 
 
     result = run_pipeline(
 
-        "Who are you?"
+        "How should you behave?"
 
     )
 
