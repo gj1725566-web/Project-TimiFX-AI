@@ -1,0 +1,26 @@
+{
+    "current_topic": "Memory System",
+    "previous_topic": "Telegram Bot",
+    "history": [
+        {
+            "message": "I love Python",
+            "topic": "Python"
+        },
+        {
+            "message": "Let's build an AI assistant",
+            "topic": "Artificial Intelligence"
+        },
+        {
+            "message": "Push this project to GitHub",
+            "topic": "Git/GitHub"
+        },
+        {
+            "message": "Create a Telegram bot",
+            "topic": "Telegram Bot"
+        },
+        {
+            "message": "How do I improve memory?",
+            "topic": "Memory System"
+        }
+    ]
+}
