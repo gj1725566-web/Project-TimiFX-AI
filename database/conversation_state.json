@@ -1,70 +1,43 @@
 {
     "current_topic": "Artificial Intelligence",
     "previous_topic": "Memory System",
+    "session_started": "2026-07-11 09:26:25.662635",
     "history": [
         {
             "message": "I love Python",
-            "topic": "Python"
+            "topic": "Python",
+            "hash": "4addf7826094555610bc0d0638e01295",
+            "time": "2026-07-11 09:26:25.735430"
         },
         {
             "message": "Let's build an AI assistant",
-            "topic": "Artificial Intelligence"
+            "topic": "Artificial Intelligence",
+            "hash": "f39a6127f41b8b43b5a23bba8a2c04b0",
+            "time": "2026-07-11 09:26:25.836749"
         },
         {
             "message": "Push this project to GitHub",
-            "topic": "Git/GitHub"
+            "topic": "Git/GitHub",
+            "hash": "f863f3b8c35e4a80e4d51d76f9916fdb",
+            "time": "2026-07-11 09:26:25.936329"
         },
         {
             "message": "Create a Telegram bot",
-            "topic": "Telegram Bot"
+            "topic": "Telegram Bot",
+            "hash": "78f7f9c18d339428272147932329536b",
+            "time": "2026-07-11 09:26:26.065401"
         },
         {
             "message": "How do I improve memory?",
-            "topic": "Memory System"
-        },
-        {
-            "message": "I love Python",
-            "topic": "Python"
-        },
-        {
-            "message": "Let's build an AI assistant",
-            "topic": "Artificial Intelligence"
-        },
-        {
-            "message": "Push this project to GitHub",
-            "topic": "Git/GitHub"
-        },
-        {
-            "message": "Create a Telegram bot",
-            "topic": "Telegram Bot"
-        },
-        {
-            "message": "How do I improve memory?",
-            "topic": "Memory System"
-        },
-        {
-            "message": "I love Python",
-            "topic": "Python"
-        },
-        {
-            "message": "Let's build an AI assistant",
-            "topic": "Artificial Intelligence"
-        },
-        {
-            "message": "Push this project to GitHub",
-            "topic": "Git/GitHub"
-        },
-        {
-            "message": "Create a Telegram bot",
-            "topic": "Telegram Bot"
-        },
-        {
-            "message": "How do I improve memory?",
-            "topic": "Memory System"
+            "topic": "Memory System",
+            "hash": "820b1fe8632a610d9572bad8d2e0554e",
+            "time": "2026-07-11 09:26:26.099347"
         },
         {
             "message": "I am excited to build the world's best AI assistant.",
-            "topic": "Artificial Intelligence"
+            "topic": "Artificial Intelligence",
+            "hash": "7bd614174c8d7aceeb4cc14c94bcf244",
+            "time": "2026-07-11 09:26:56.551652"
         }
     ]
 }

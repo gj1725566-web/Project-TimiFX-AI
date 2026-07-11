@@ -1,19 +1,24 @@
 """
 ===========================================
 TimiFX AI Decision Engine
-Author: Timilehin
-Version: 1.0
+Phase 25 - Tool Intelligence Upgrade
 
 Responsible for deciding which
 intelligence systems should be used
 for each user request.
+
+Author: Timilehin
 ===========================================
 """
 
 
 def make_decision(reasoning, emotion, topic):
 
+
     decision = {
+
+
+        # Core intelligence
 
         "use_identity": False,
 
@@ -27,53 +32,73 @@ def make_decision(reasoning, emotion, topic):
 
         "use_planner": False,
 
-        "use_knowledge": False
+        "use_knowledge": False,
+
+
+        # Tool Intelligence
+
+        "use_tools": False
 
     }
 
 
-    intent = reasoning.get("intent", "general")
+
+    intent = reasoning.get(
+        "intent",
+        "general"
+    )
 
 
-    # -----------------------------
+
+    # =====================================
     # Identity
-    # -----------------------------
+    # =====================================
 
     if intent == "identity":
 
         decision["use_identity"] = True
 
 
-    # -----------------------------
-    # Memory
-    # -----------------------------
 
-    if reasoning.get("use_memory"):
+    # =====================================
+    # Memory
+    # =====================================
+
+    if reasoning.get(
+        "use_memory"
+    ):
 
         decision["use_memory"] = True
 
 
-    # -----------------------------
-    # Knowledge
-    # -----------------------------
 
-    if reasoning.get("use_knowledge"):
+    # =====================================
+    # Knowledge
+    # =====================================
+
+    if reasoning.get(
+        "use_knowledge"
+    ):
 
         decision["use_knowledge"] = True
 
 
-    # -----------------------------
-    # Emotion
-    # -----------------------------
 
-    if emotion["confidence"] == "high":
+    # =====================================
+    # Emotion
+    # =====================================
+
+    if emotion.get(
+        "confidence"
+    ) == "high":
 
         decision["use_emotion"] = True
 
 
-    # -----------------------------
+
+    # =====================================
     # Planner
-    # -----------------------------
+    # =====================================
 
     if intent in [
 
@@ -86,17 +111,33 @@ def make_decision(reasoning, emotion, topic):
         decision["use_planner"] = True
 
 
-    # -----------------------------
+
+    # =====================================
+    # Tool Intelligence
+    # =====================================
+
+    if intent in [
+
+        "math"
+
+    ]:
+
+        decision["use_tools"] = True
+
+
+
+    # =====================================
     # Conversation
-
-    # Always enabled
-
-    # -----------------------------
+    # =====================================
 
     decision["topic"] = topic
 
 
+
     return decision
+
+
+
 
 
 # ===========================================
@@ -105,31 +146,44 @@ def make_decision(reasoning, emotion, topic):
 
 if __name__ == "__main__":
 
-    print("=" * 50)
-
-    print("TimiFX AI Decision Engine Test")
 
     print("=" * 50)
+
+    print(
+        "TimiFX AI Decision Engine Test"
+    )
+
+    print("=" * 50)
+
+
 
     reasoning = {
 
-        "intent": "programming",
 
-        "use_memory": True,
+        "intent": "math",
 
-        "use_knowledge": True
+        "use_memory": False,
+
+        "use_knowledge": False
 
     }
+
+
 
     emotion = {
 
-        "emotion": "confused",
 
-        "confidence": "high"
+        "emotion": "neutral",
+
+        "confidence": "low"
 
     }
 
-    topic = "Python"
+
+
+    topic = "Mathematics"
+
+
 
     result = make_decision(
 
@@ -140,6 +194,8 @@ if __name__ == "__main__":
         topic
 
     )
+
+
 
     print()
 

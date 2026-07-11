@@ -1,28 +1,37 @@
 """
 ===========================================
 TimiFX AI Conversation Engine
-Author: Timilehin
-Version: 1.0
+Phase 25 - Conversation Intelligence Upgrade
 
-Responsible for:
+Responsibilities:
 
 - Topic Detection
-- Topic Switching
-- Conversation State
+- Conversation State Management
+- Duplicate Protection
 - Conversation Summary
-- Conversation Reset
+- Memory Cleanup
+- Session Control
+
+Author: Timilehin
 ===========================================
 """
 
 import json
 import os
+import hashlib
+from datetime import datetime
 
+
+# ===========================================
+# Database Location
+# ===========================================
 
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
         os.path.abspath(__file__)
     )
 )
+
 
 DATABASE = os.path.join(
     PROJECT_ROOT,
@@ -31,19 +40,51 @@ DATABASE = os.path.join(
 )
 
 
+# ===========================================
+# Settings
+# ===========================================
+
+MAX_HISTORY = 25
+
+
+# ===========================================
+# Default Conversation State
+# ===========================================
+
 DEFAULT_STATE = {
 
     "current_topic": "General",
 
     "previous_topic": "",
 
+    "session_started":
+
+        str(datetime.now()),
+
     "history": []
 
 }
 
 
+
 # ===========================================
-# Load conversation state
+# Message Hash
+# ===========================================
+
+def create_message_hash(message):
+
+    return hashlib.md5(
+
+        message.strip()
+        .lower()
+        .encode()
+
+    ).hexdigest()
+
+
+
+# ===========================================
+# Load State
 # ===========================================
 
 def load_state():
@@ -54,28 +95,54 @@ def load_state():
 
         return DEFAULT_STATE.copy()
 
-    with open(DATABASE, "r", encoding="utf-8") as file:
 
-        return json.load(file)
+    try:
+
+        with open(
+            DATABASE,
+            "r",
+            encoding="utf-8"
+        ) as file:
+
+            return json.load(file)
+
+
+    except:
+
+        save_state(DEFAULT_STATE)
+
+        return DEFAULT_STATE.copy()
+
 
 
 # ===========================================
-# Save conversation state
+# Save State
 # ===========================================
 
 def save_state(state):
 
-    with open(DATABASE, "w", encoding="utf-8") as file:
+    with open(
+        DATABASE,
+        "w",
+        encoding="utf-8"
+    ) as file:
 
         json.dump(
+
             state,
+
             file,
-            indent=4
+
+            indent=4,
+
+            ensure_ascii=False
+
         )
 
 
+
 # ===========================================
-# Detect Topic
+# Topic Detection
 # ===========================================
 
 def detect_topic(message):
@@ -85,7 +152,10 @@ def detect_topic(message):
 
     topics = {
 
-        "Python": [
+
+        "Python":
+
+        [
 
             "python",
             "coding",
@@ -94,7 +164,11 @@ def detect_topic(message):
 
         ],
 
-        "Artificial Intelligence": [
+
+
+        "Artificial Intelligence":
+
+        [
 
             "ai",
             "assistant",
@@ -104,7 +178,11 @@ def detect_topic(message):
 
         ],
 
-        "Memory System": [
+
+
+        "Memory System":
+
+        [
 
             "memory",
             "profile",
@@ -112,7 +190,11 @@ def detect_topic(message):
 
         ],
 
-        "Git/GitHub": [
+
+
+        "Git/GitHub":
+
+        [
 
             "git",
             "github",
@@ -122,7 +204,11 @@ def detect_topic(message):
 
         ],
 
-        "Telegram Bot": [
+
+
+        "Telegram Bot":
+
+        [
 
             "telegram",
             "bot",
@@ -130,16 +216,36 @@ def detect_topic(message):
 
         ],
 
-        "Web Development": [
+
+
+        "Web Development":
+
+        [
 
             "website",
             "flask",
             "fastapi",
             "api"
 
+        ],
+
+
+
+        "Mathematics":
+
+        [
+
+            "calculate",
+            "math",
+            "+",
+            "-",
+            "*",
+            "/"
+
         ]
 
     }
+
 
 
     for topic, keywords in topics.items():
@@ -151,43 +257,98 @@ def detect_topic(message):
                 return topic
 
 
+
     return "General"
 
 
+
 # ===========================================
-# Update State
+# Update Conversation
 # ===========================================
 
 def update_conversation(message):
 
+
     state = load_state()
 
-    detected = detect_topic(message)
 
-    if detected != state["current_topic"]:
-
-        state["previous_topic"] = state["current_topic"]
-
-        state["current_topic"] = detected
+    topic = detect_topic(message)
 
 
-    state["history"].append({
-
-        "message": message,
-
-        "topic": detected
-
-    })
+    message_hash = create_message_hash(
+        message
+    )
 
 
-    if len(state["history"]) > 25:
 
-        state["history"] = state["history"][-25:]
+    # ---------------------------------------
+    # Prevent duplicate messages
+    # ---------------------------------------
+
+    for item in state["history"]:
+
+        if item.get("hash") == message_hash:
+
+            return state
+
+
+
+    # ---------------------------------------
+    # Update topics
+    # ---------------------------------------
+
+    if topic != state["current_topic"]:
+
+        state["previous_topic"] = (
+            state["current_topic"]
+        )
+
+
+        state["current_topic"] = topic
+
+
+
+    # ---------------------------------------
+    # Add new conversation
+    # ---------------------------------------
+
+    state["history"].append(
+
+        {
+
+            "message": message,
+
+            "topic": topic,
+
+            "hash": message_hash,
+
+            "time": str(datetime.now())
+
+        }
+
+    )
+
+
+
+    # ---------------------------------------
+    # Memory cleanup
+    # ---------------------------------------
+
+    if len(state["history"]) > MAX_HISTORY:
+
+        state["history"] = (
+
+            state["history"][-MAX_HISTORY:]
+
+        )
+
 
 
     save_state(state)
 
+
     return state
+
 
 
 # ===========================================
@@ -199,6 +360,7 @@ def get_current_topic():
     return load_state()["current_topic"]
 
 
+
 # ===========================================
 # Previous Topic
 # ===========================================
@@ -208,55 +370,67 @@ def get_previous_topic():
     return load_state()["previous_topic"]
 
 
+
 # ===========================================
 # Conversation Summary
 # ===========================================
 
-def get_summary():
+def get_conversation_summary():
 
     state = load_state()
 
-    lines = []
 
-    lines.append(
+    summary = []
+
+
+    summary.append(
 
         f"Current Topic: {state['current_topic']}"
 
     )
 
+
     if state["previous_topic"]:
 
-        lines.append(
+        summary.append(
 
             f"Previous Topic: {state['previous_topic']}"
 
         )
 
-    lines.append("")
 
-    lines.append("Recent Conversation:")
+    summary.append("")
+
+
+    summary.append(
+        "Recent Conversation:"
+    )
+
+
 
     for item in state["history"][-5:]:
 
-        lines.append(
+
+        summary.append(
 
             f"- [{item['topic']}] {item['message']}"
 
         )
 
-    return "\n".join(lines)
+
+    return "\n".join(summary)
+
+
+
 # ===========================================
-# Conversation Summary Compatibility Function
+# Alias
 # ===========================================
 
-def get_conversation_summary():
+def get_summary():
 
-    """
-    Compatibility wrapper used by the orchestrator.
-    Returns the current conversation summary.
-    """
+    return get_conversation_summary()
 
-    return get_summary()
+
 
 # ===========================================
 # Reset Conversation
@@ -264,7 +438,10 @@ def get_conversation_summary():
 
 def reset_conversation():
 
-    save_state(DEFAULT_STATE)
+    save_state(
+        DEFAULT_STATE
+    )
+
 
 
 # ===========================================
@@ -273,13 +450,22 @@ def reset_conversation():
 
 if __name__ == "__main__":
 
-    print("=" * 50)
-
-    print("TimiFX AI Conversation Engine Test")
 
     print("=" * 50)
 
-    messages = [
+    print(
+        "TimiFX AI Conversation Engine Test"
+    )
+
+    print("=" * 50)
+
+
+
+    reset_conversation()
+
+
+
+    tests = [
 
         "I love Python",
 
@@ -289,34 +475,54 @@ if __name__ == "__main__":
 
         "Create a Telegram bot",
 
+        "How do I improve memory?",
+
         "How do I improve memory?"
 
     ]
 
-    for message in messages:
+
+
+    for message in tests:
+
 
         print()
 
-        print("Message:")
+        print(
+            "Message:"
+        )
 
         print(message)
 
-        state = update_conversation(message)
+
+        result = update_conversation(
+            message
+        )
+
 
         print()
 
-        print("Detected Topic:")
+        print(
+            "Current Topic:"
+        )
 
-        print(state["current_topic"])
+        print(
+            result["current_topic"]
+        )
+
+
 
     print()
 
     print("=" * 50)
 
-    print("Conversation Summary")
+    print(
+        "Summary"
+    )
 
     print("=" * 50)
 
-    print()
 
-    print(get_summary())
+    print(
+        get_conversation_summary()
+    )
