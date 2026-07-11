@@ -1,6 +1,6 @@
 {
-    "current_topic": "Memory System",
-    "previous_topic": "Telegram Bot",
+    "current_topic": "Artificial Intelligence",
+    "previous_topic": "Memory System",
     "history": [
         {
             "message": "I love Python",
@@ -21,6 +21,50 @@
         {
             "message": "How do I improve memory?",
             "topic": "Memory System"
+        },
+        {
+            "message": "I love Python",
+            "topic": "Python"
+        },
+        {
+            "message": "Let's build an AI assistant",
+            "topic": "Artificial Intelligence"
+        },
+        {
+            "message": "Push this project to GitHub",
+            "topic": "Git/GitHub"
+        },
+        {
+            "message": "Create a Telegram bot",
+            "topic": "Telegram Bot"
+        },
+        {
+            "message": "How do I improve memory?",
+            "topic": "Memory System"
+        },
+        {
+            "message": "I love Python",
+            "topic": "Python"
+        },
+        {
+            "message": "Let's build an AI assistant",
+            "topic": "Artificial Intelligence"
+        },
+        {
+            "message": "Push this project to GitHub",
+            "topic": "Git/GitHub"
+        },
+        {
+            "message": "Create a Telegram bot",
+            "topic": "Telegram Bot"
+        },
+        {
+            "message": "How do I improve memory?",
+            "topic": "Memory System"
+        },
+        {
+            "message": "I am excited to build the world's best AI assistant.",
+            "topic": "Artificial Intelligence"
         }
     ]
 }

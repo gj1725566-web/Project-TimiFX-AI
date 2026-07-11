@@ -245,7 +245,18 @@ def get_summary():
         )
 
     return "\n".join(lines)
+# ===========================================
+# Conversation Summary Compatibility Function
+# ===========================================
 
+def get_conversation_summary():
+
+    """
+    Compatibility wrapper used by the orchestrator.
+    Returns the current conversation summary.
+    """
+
+    return get_summary()
 
 # ===========================================
 # Reset Conversation

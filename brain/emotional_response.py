@@ -12,12 +12,12 @@ Author: Timilehin
 ===========================================
 """
 
-
-import sys
 import os
+import sys
 
-
+# ===========================================
 # Add project root
+# ===========================================
 
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
@@ -25,38 +25,33 @@ PROJECT_ROOT = os.path.dirname(
     )
 )
 
-
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 
-
+# ===========================================
+# Imports
+# ===========================================
 
 from brain.emotion_engine import (
     detect_emotion,
     emotion_instruction
 )
 
-
-
-
+# ===========================================
+# Generate Emotional Guidance
+# ===========================================
 
 def generate_emotional_guidance(message):
-
     """
-    Creates response guidance
-    based on detected emotion.
+    Analyze the user's emotion and return
+    guidance for the AI.
     """
 
-
-    emotion_data = detect_emotion(
-        message
-    )
-
+    emotion_data = detect_emotion(message)
 
     instruction = emotion_instruction(
         emotion_data
     )
-
 
     return {
 
@@ -67,27 +62,43 @@ def generate_emotional_guidance(message):
     }
 
 
+# ===========================================
+# Backward Compatibility
+# ===========================================
 
-
-
-
-
-def apply_emotional_style(response, message):
-
+def build_emotional_context(message):
     """
-    Adjust AI response style
-    based on user's emotion.
+    Older modules (such as the orchestrator)
+    expect this function.
+
+    It simply wraps
+    generate_emotional_guidance().
     """
 
-
-    emotion_data = detect_emotion(
+    return generate_emotional_guidance(
         message
     )
 
 
-    emotion = emotion_data["emotion"]
+# ===========================================
+# Apply Emotional Style
+# ===========================================
 
+def apply_emotional_style(
+    response,
+    message
+):
+    """
+    Modify the AI response based on the
+    detected user emotion.
+    """
 
+    emotion_data = detect_emotion(message)
+
+    emotion = emotion_data.get(
+        "emotion",
+        "neutral"
+    )
 
     if emotion == "happy":
 
@@ -96,58 +107,43 @@ def apply_emotional_style(response, message):
             + response
         )
 
-
-
     elif emotion == "sad":
 
         return (
-            "I understand. "
-            "I'm here to support you.\n\n"
+            "I'm sorry you're feeling that way.\n"
+            "I'm here to help.\n\n"
             + response
         )
-
-
 
     elif emotion == "frustrated":
 
         return (
-            "I understand this can be challenging. "
+            "I understand this can be frustrating.\n"
             "Let's solve it step by step.\n\n"
             + response
         )
 
-
-
     elif emotion == "confused":
 
         return (
-            "No problem. I'll explain it clearly "
+            "No problem.\n"
+            "I'll explain everything clearly "
             "step by step.\n\n"
             + response
         )
 
-
-
     return response
 
 
-
-
-
-
+# ===========================================
+# Test
+# ===========================================
 
 if __name__ == "__main__":
 
-
     print("=" * 50)
-
-    print(
-        "TimiFX AI Emotional Response Engine Test"
-    )
-
+    print("TimiFX AI Emotional Response Engine Test")
     print("=" * 50)
-
-
 
     test_messages = [
 
@@ -163,27 +159,19 @@ if __name__ == "__main__":
 
     ]
 
-
-
     for message in test_messages:
 
-
-        result = generate_emotional_guidance(
+        result = build_emotional_context(
             message
         )
-
 
         print()
 
-        print(
-            "Message:",
-            message
-        )
+        print("Message:")
+        print(message)
 
+        print()
 
-        print(
-            result
-        )
-
+        print(result)
 
         print("-" * 50)
