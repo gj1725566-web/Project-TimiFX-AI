@@ -1,19 +1,16 @@
 """
 ===========================================
-TimiFX AI Orchestrator
+TimiFX AI Master Orchestrator
+Phase 25.6 - Full Brain Integration
+
 Author: Timilehin
-Version: 1.0
-
-The Orchestrator is the central controller
-of TimiFX AI.
-
-It coordinates every intelligence engine
-before generating the final AI response.
 ===========================================
 """
 
+
 import sys
 import os
+
 
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
@@ -21,319 +18,280 @@ PROJECT_ROOT = os.path.dirname(
     )
 )
 
+
 if PROJECT_ROOT not in sys.path:
     sys.path.append(PROJECT_ROOT)
 
 
-# ==========================================
-# Brain Engines
-# ==========================================
 
-from brain.reasoning import analyze_intent
+# ===============================
+# IMPORT ENGINES
+# ===============================
 
-from brain.planner import create_plan
 
-from brain.context_manager import process_user_memory
-
-from brain.profile import load_profile
-
-from brain.memory_retriever import get_memory_context
-
-from brain.identity import (
-    get_identity,
-    identity_message
+from brain.reasoning import (
+    analyze_intent
 )
 
-from brain.personality_engine import (
-    get_personality,
-    personality_message
-)
-
-from brain.emotion_engine import (
-    detect_emotion,
-    emotion_instruction
-)
 
 from brain.emotional_response import (
-    build_emotional_context
+    detect_emotion
 )
+
 
 from brain.conversation_engine import (
     update_conversation,
     get_conversation_summary
 )
 
+
 from brain.decision_engine import (
     make_decision
 )
 
 
-# ==========================================
-# Database
-# ==========================================
-
-from database.memory import (
-    get_conversation_history
-)
-
-from database.knowledge import (
-    get_knowledge
+from brain.planner import (
+    create_plan
 )
 
 
-# ==========================================
-# AI Backend
-# ==========================================
-
-from backend.ai_engine import (
-    generate_response
+from brain.tool_router import (
+    route_tool
 )
 
 
-# ==========================================
-# Main Orchestrator
-# ==========================================
 
-def run_orchestrator(
-    user_message,
-    user_name="Timilehin"
-):
+# ===============================
+# AI RESPONSE ENGINE
+# ===============================
 
-    # --------------------------------------
-    # 1. Reasoning
-    # --------------------------------------
+try:
+
+    from backend.ai_engine import (
+        generate_response
+    )
+
+except Exception:
+
+
+    def generate_response(messages):
+
+        return (
+            "TimiFX AI response engine is "
+            "currently running in fallback mode."
+        )
+
+
+
+
+
+# ===============================
+# MAIN THINK FUNCTION
+# ===============================
+
+
+def think(message):
+
+
+    # ----------------------------
+    # Reasoning
+    # ----------------------------
 
     reasoning = analyze_intent(
-        user_message
+        message
     )
 
-    # --------------------------------------
-    # 2. Learn
-    # --------------------------------------
 
-    process_user_memory(
-        user_message
-    )
 
-    profile = load_profile()
-
-    # --------------------------------------
-    # 3. Identity
-    # --------------------------------------
-
-    identity = get_identity()
-
-    identity_context = identity_message()
-
-    # --------------------------------------
-    # 4. Personality
-    # --------------------------------------
-
-    personality = get_personality()
-
-    personality_context = personality_message()
-
-    # --------------------------------------
-    # 5. Emotion
-    # --------------------------------------
+    # ----------------------------
+    # Emotion
+    # ----------------------------
 
     emotion = detect_emotion(
-        user_message
+        message
     )
 
-    emotional_context = build_emotional_context(
-        user_message
+
+
+    # ----------------------------
+    # Conversation Memory
+    # ----------------------------
+
+    conversation = update_conversation(
+        message
     )
 
-    # --------------------------------------
-    # 6. Conversation
-    # --------------------------------------
 
-    topic = update_conversation(
-        user_message
-    )
 
-    conversation_summary = get_conversation_summary()
-
-    # --------------------------------------
-    # 7. Memory
-    # --------------------------------------
-
-    memory_context = get_memory_context(
-        user_message
-    )
-
-    conversation_memory = []
-
-    if reasoning["use_memory"]:
-
-        conversation_memory = get_conversation_history(
-            user_name
-        )
-
-    # --------------------------------------
-    # 8. Knowledge
-    # --------------------------------------
-
-    knowledge = {}
-
-    if reasoning["use_knowledge"]:
-
-        knowledge = get_knowledge()
-
-    # --------------------------------------
-    # 9. Planner
-    # --------------------------------------
-
-    plan = None
-
-    if reasoning["intent"] in [
-
-        "programming",
-
-        "general"
-
-    ]:
-
-        plan = create_plan(
-            user_message
-        )
-
-    # --------------------------------------
-    # 10. Decision
-    # --------------------------------------
+    # ----------------------------
+    # Decision Making
+    # ----------------------------
 
     decision = make_decision(
+
         reasoning,
+
         emotion,
-        topic
+
+        conversation,
+
+        message
+
     )
 
-    # --------------------------------------
-    # 11. Build AI Context
-    # --------------------------------------
 
-    conversation = []
 
-    conversation.extend(
-        conversation_memory
-    )
+    # ----------------------------
+    # Tool Execution
+    # ----------------------------
 
-    if decision["use_identity"]:
+    if decision.get(
+        "use_tools"
+    ):
 
-        conversation.append({
 
-            "role": "system",
+        tool_result = route_tool(
+            message
+        )
 
-            "content": identity_context
 
-        })
+        if tool_result.get(
+            "success"
+        ):
 
-    if decision["use_personality"]:
 
-        conversation.append({
+            return {
 
-            "role": "system",
+                "response":
+                tool_result["result"],
 
-            "content": personality_context
+                "tool_used":
+                True,
 
-        })
+                "tool":
+                decision.get(
+                    "tool"
+                ),
 
-    if decision["use_memory"]:
+                "decision":
+                decision
 
-        conversation.append({
+            }
 
-            "role": "system",
 
-            "content": memory_context
 
-        })
 
-    if decision["use_emotion"]:
+    # ----------------------------
+    # Normal AI Response
+    # ----------------------------
 
-        conversation.append({
-
-            "role": "system",
-
-            "content": emotional_context["response_guidance"]
-
-        })
-
-    if decision["use_conversation"]:
-
-        conversation.append({
-
-            "role": "system",
-
-            "content": conversation_summary
-
-        })
-
-    conversation.append({
-
-        "role": "user",
-
-        "content": user_message
-
-    })
-
-    # --------------------------------------
-    # 12. AI Response
-    # --------------------------------------
 
     response = generate_response(
-        conversation
+
+        [
+
+            {
+
+                "role":
+                "user",
+
+                "content":
+                message
+
+            }
+
+        ]
+
     )
 
-    # --------------------------------------
-    # Return Complete Intelligence Package
-    # --------------------------------------
+
 
     return {
 
-        "response": response,
+        "response":
+        response,
 
-        "reasoning": reasoning,
 
-        "decision": decision,
+        "reasoning":
+        reasoning,
 
-        "emotion": emotion,
 
-        "plan": plan,
+        "emotion":
+        emotion,
 
-        "knowledge": knowledge,
 
-        "profile": profile,
+        "decision":
+        decision,
 
-        "identity": identity,
 
-        "personality": personality,
+        "plan":
+        create_plan(
+            message
+        ),
 
-        "memory_context": memory_context,
 
-        "conversation_summary": conversation_summary
+        "conversation":
+        conversation,
+
+
+        "summary":
+        get_conversation_summary()
 
     }
 
 
-# ==========================================
-# Testing
-# ==========================================
+
+
+
+# ===============================
+# TEST
+# ===============================
+
 
 if __name__ == "__main__":
 
-    print("=" * 50)
-
-    print("TimiFX AI Orchestrator Test")
 
     print("=" * 50)
 
-    result = run_orchestrator(
-
-        "I am excited to build the world's best AI assistant."
-
+    print(
+        "TimiFX AI Orchestrator Test"
     )
 
-    print()
+    print("=" * 50)
 
-    print(result)
+
+
+    tests = [
+
+        "hello",
+
+        "calculate 50+50",
+
+        "I am excited to build the world's best AI assistant"
+
+    ]
+
+
+
+    for message in tests:
+
+
+        print()
+
+        print(
+            "USER:",
+            message
+        )
+
+
+        print()
+
+
+        result = think(
+            message
+        )
+
+
+        print(
+            result
+        )

@@ -1,6 +1,6 @@
 {
     "current_topic": "Artificial Intelligence",
-    "previous_topic": "Memory System",
+    "previous_topic": "Mathematics",
     "session_started": "2026-07-11 09:26:25.662635",
     "history": [
         {
@@ -38,6 +38,24 @@
             "topic": "Artificial Intelligence",
             "hash": "7bd614174c8d7aceeb4cc14c94bcf244",
             "time": "2026-07-11 09:26:56.551652"
+        },
+        {
+            "message": "hello",
+            "topic": "General",
+            "hash": "5d41402abc4b2a76b9719d911017c592",
+            "time": "2026-07-11 10:12:44.314961"
+        },
+        {
+            "message": "calculate 50+50",
+            "topic": "Mathematics",
+            "hash": "66e0aad53448a5ef6b437d485836c05a",
+            "time": "2026-07-11 10:21:07.178335"
+        },
+        {
+            "message": "I am excited to build the world's best AI assistant",
+            "topic": "Artificial Intelligence",
+            "hash": "ec755e853ac1930673553d6836980222",
+            "time": "2026-07-11 10:21:07.209167"
         }
     ]
 }
