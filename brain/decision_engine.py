@@ -1,24 +1,96 @@
 """
 ===========================================
 TimiFX AI Decision Engine
-Phase 25 - Tool Intelligence Upgrade
+Phase 25.3 - Intelligence Routing Layer
 
-Responsible for deciding which
-intelligence systems should be used
-for each user request.
+Responsible for deciding:
+
+- Memory usage
+- Knowledge usage
+- Emotion usage
+- Planning
+- Tool execution
 
 Author: Timilehin
 ===========================================
 """
 
 
-def make_decision(reasoning, emotion, topic):
+def detect_tool_need(message):
+
+    text = message.lower()
+
+
+    # Calculator
+
+    if any(word in text for word in [
+
+        "calculate",
+        "calculator",
+        "+",
+        "-",
+        "*",
+        "/"
+
+    ]):
+
+        return {
+
+            "needed": True,
+
+            "tool": "calculator"
+
+        }
+
+
+
+    # Greeting tool
+
+    if any(word in text for word in [
+
+        "hello",
+        "hi",
+        "hey"
+
+    ]):
+
+        return {
+
+            "needed": True,
+
+            "tool": "hello"
+
+        }
+
+
+
+    return {
+
+        "needed": False,
+
+        "tool": None
+
+    }
+
+
+
+
+
+def make_decision(
+
+    reasoning,
+
+    emotion,
+
+    topic,
+
+    message=""
+
+):
 
 
     decision = {
 
-
-        # Core intelligence
 
         "use_identity": False,
 
@@ -35,24 +107,25 @@ def make_decision(reasoning, emotion, topic):
         "use_knowledge": False,
 
 
-        # Tool Intelligence
+        "use_tools": False,
 
-        "use_tools": False
+        "tool": None
 
     }
 
 
 
     intent = reasoning.get(
+
         "intent",
+
         "general"
+
     )
 
 
 
-    # =====================================
     # Identity
-    # =====================================
 
     if intent == "identity":
 
@@ -60,45 +133,43 @@ def make_decision(reasoning, emotion, topic):
 
 
 
-    # =====================================
     # Memory
-    # =====================================
 
     if reasoning.get(
+
         "use_memory"
+
     ):
 
         decision["use_memory"] = True
 
 
 
-    # =====================================
     # Knowledge
-    # =====================================
 
     if reasoning.get(
+
         "use_knowledge"
+
     ):
 
         decision["use_knowledge"] = True
 
 
 
-    # =====================================
     # Emotion
-    # =====================================
 
     if emotion.get(
+
         "confidence"
+
     ) == "high":
 
         decision["use_emotion"] = True
 
 
 
-    # =====================================
     # Planner
-    # =====================================
 
     if intent in [
 
@@ -112,23 +183,24 @@ def make_decision(reasoning, emotion, topic):
 
 
 
-    # =====================================
-    # Tool Intelligence
-    # =====================================
+    # Tools
 
-    if intent in [
+    tool_result = detect_tool_need(
 
-        "math"
+        message
 
-    ]:
+    )
+
+
+    if tool_result["needed"]:
+
 
         decision["use_tools"] = True
 
 
+        decision["tool"] = tool_result["tool"]
 
-    # =====================================
-    # Conversation
-    # =====================================
+
 
     decision["topic"] = topic
 
@@ -144,17 +216,8 @@ def make_decision(reasoning, emotion, topic):
 # Test
 # ===========================================
 
+
 if __name__ == "__main__":
-
-
-    print("=" * 50)
-
-    print(
-        "TimiFX AI Decision Engine Test"
-    )
-
-    print("=" * 50)
-
 
 
     reasoning = {
@@ -169,7 +232,6 @@ if __name__ == "__main__":
     }
 
 
-
     emotion = {
 
 
@@ -181,22 +243,18 @@ if __name__ == "__main__":
 
 
 
-    topic = "Mathematics"
+    print(
 
+        make_decision(
 
+            reasoning,
 
-    result = make_decision(
+            emotion,
 
-        reasoning,
+            "Mathematics",
 
-        emotion,
+            "calculate 50+50"
 
-        topic
+        )
 
     )
-
-
-
-    print()
-
-    print(result)
