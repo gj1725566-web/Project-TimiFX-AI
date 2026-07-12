@@ -5,6 +5,24 @@
             "type": "long_term",
             "importance": 8,
             "created": "2026-07-11 10:38:57.439528"
+        },
+        {
+            "content": "My name is Timilehin",
+            "type": "long_term",
+            "importance": 8,
+            "created": "2026-07-11 18:32:55.389430"
+        },
+        {
+            "content": "Remember I like Python",
+            "type": "long_term",
+            "importance": 8,
+            "created": "2026-07-11 18:32:55.397897"
+        },
+        {
+            "content": "I love Artificial Intelligence",
+            "type": "long_term",
+            "importance": 8,
+            "created": "2026-07-11 18:32:55.445898"
         }
     ]
 }
