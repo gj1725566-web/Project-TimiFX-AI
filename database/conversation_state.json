@@ -1,5 +1,5 @@
 {
-    "current_topic": "Artificial Intelligence",
+    "current_topic": "Memory System",
     "previous_topic": "Mathematics",
     "session_started": "2026-07-11 09:26:25.662635",
     "history": [
@@ -56,6 +56,24 @@
             "topic": "Artificial Intelligence",
             "hash": "ec755e853ac1930673553d6836980222",
             "time": "2026-07-11 10:21:07.209167"
+        },
+        {
+            "message": "My name is Timilehin",
+            "topic": "General",
+            "hash": "0f69d746cb019ad599b3ca6da21d94a8",
+            "time": "2026-07-11 19:39:20.876652"
+        },
+        {
+            "message": "calculate 100+50",
+            "topic": "Mathematics",
+            "hash": "1ae009e18e25daa18dd2122e55be239f",
+            "time": "2026-07-11 19:39:23.302728"
+        },
+        {
+            "message": "What do you remember about me?",
+            "topic": "Memory System",
+            "hash": "76d6b1bdcb2a35f4bf1918965e7a526b",
+            "time": "2026-07-11 19:39:23.328339"
         }
     ]
 }

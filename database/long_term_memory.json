@@ -23,6 +23,24 @@
             "type": "long_term",
             "importance": 8,
             "created": "2026-07-11 18:32:55.445898"
+        },
+        {
+            "content": "My name is Timilehin",
+            "type": "long_term",
+            "importance": 8,
+            "created": "2026-07-11 19:39:20.879039"
+        },
+        {
+            "content": "I love Python",
+            "type": "long_term",
+            "importance": 8,
+            "created": "2026-07-11 19:39:20.970594"
+        },
+        {
+            "content": "What do you remember about me?",
+            "type": "long_term",
+            "importance": 8,
+            "created": "2026-07-11 19:39:23.330833"
         }
     ]
 }

@@ -1,7 +1,17 @@
 """
 ===========================================
 TimiFX AI Master Orchestrator
-Phase 25.6 - Full Brain Integration
+Phase 30 - Learning Brain Integration
+
+Responsibilities:
+
+- Reasoning
+- Emotion Detection
+- Conversation Tracking
+- Memory Learning
+- Decision Making
+- Tool Execution
+- AI Response Generation
 
 Author: Timilehin
 ===========================================
@@ -24,9 +34,9 @@ if PROJECT_ROOT not in sys.path:
 
 
 
-# ===============================
+# ===========================================
 # IMPORT ENGINES
-# ===============================
+# ===========================================
 
 
 from brain.reasoning import (
@@ -42,6 +52,11 @@ from brain.emotional_response import (
 from brain.conversation_engine import (
     update_conversation,
     get_conversation_summary
+)
+
+
+from brain.learning_engine import (
+    learn
 )
 
 
@@ -61,9 +76,10 @@ from brain.tool_router import (
 
 
 
-# ===============================
+# ===========================================
 # AI RESPONSE ENGINE
-# ===============================
+# ===========================================
+
 
 try:
 
@@ -71,23 +87,22 @@ try:
         generate_response
     )
 
+
 except Exception:
 
 
     def generate_response(messages):
 
         return (
-            "TimiFX AI response engine is "
-            "currently running in fallback mode."
+            "TimiFX AI response engine "
+            "fallback mode."
         )
 
 
 
-
-
-# ===============================
-# MAIN THINK FUNCTION
-# ===============================
+# ===========================================
+# THINK FUNCTION
+# ===========================================
 
 
 def think(message):
@@ -124,7 +139,17 @@ def think(message):
 
 
     # ----------------------------
-    # Decision Making
+    # Learning System
+    # ----------------------------
+
+    learning = learn(
+        message
+    )
+
+
+
+    # ----------------------------
+    # Decision Engine
     # ----------------------------
 
     decision = make_decision(
@@ -165,19 +190,25 @@ def think(message):
                 "response":
                 tool_result["result"],
 
+
                 "tool_used":
                 True,
+
 
                 "tool":
                 decision.get(
                     "tool"
                 ),
 
+
+                "learning":
+                learning,
+
+
                 "decision":
                 decision
 
             }
-
 
 
 
@@ -195,6 +226,7 @@ def think(message):
                 "role":
                 "user",
 
+
                 "content":
                 message
 
@@ -208,6 +240,7 @@ def think(message):
 
     return {
 
+
         "response":
         response,
 
@@ -218,6 +251,10 @@ def think(message):
 
         "emotion":
         emotion,
+
+
+        "learning":
+        learning,
 
 
         "decision":
@@ -241,11 +278,9 @@ def think(message):
 
 
 
-
-
-# ===============================
+# ===========================================
 # TEST
-# ===============================
+# ===========================================
 
 
 if __name__ == "__main__":
@@ -254,7 +289,7 @@ if __name__ == "__main__":
     print("=" * 50)
 
     print(
-        "TimiFX AI Orchestrator Test"
+        "TimiFX AI Learning Brain Test"
     )
 
     print("=" * 50)
@@ -263,11 +298,13 @@ if __name__ == "__main__":
 
     tests = [
 
-        "hello",
+        "My name is Timilehin",
 
-        "calculate 50+50",
+        "I love Python",
 
-        "I am excited to build the world's best AI assistant"
+        "calculate 100+50",
+
+        "What do you remember about me?"
 
     ]
 
@@ -282,7 +319,6 @@ if __name__ == "__main__":
             "USER:",
             message
         )
-
 
         print()
 
