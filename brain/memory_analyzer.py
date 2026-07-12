@@ -1,12 +1,14 @@
 """
 ===========================================
 TimiFX AI Memory Analyzer
-Phase 26
+Phase 29.5
 
 Responsible for:
+
 - Detecting important information
+- Filtering bad memories
 - Classifying memories
-- Assigning memory type
+- Assigning importance
 
 Author: Timilehin
 ===========================================
@@ -15,7 +17,7 @@ Author: Timilehin
 
 def analyze_memory(message):
 
-    text = message.lower()
+    text = message.lower().strip()
 
 
     memory = {
@@ -29,23 +31,84 @@ def analyze_memory(message):
     }
 
 
-    important_keywords = [
 
-        "my name is",
-        "remember",
-        "i like",
-        "i love",
-        "my favorite",
-        "i prefer",
-        "my project",
-        "i work"
+    # ======================================
+    # Ignore Questions
+    # ======================================
+
+    question_words = [
+
+        "what",
+        "why",
+        "how",
+        "when",
+        "where",
+        "who",
+        "can you",
+        "could you",
+        "do you"
 
     ]
 
 
+    for word in question_words:
+
+        if text.startswith(word):
+
+            return memory
+
+
+
+    # ======================================
+    # Ignore Commands
+    # ======================================
+
+    if any(symbol in text for symbol in [
+
+        "+",
+        "-",
+        "*",
+        "/"
+
+    ]):
+
+        return memory
+
+
+
+    # ======================================
+    # Long Term Memory Detection
+    # ======================================
+
+    important_keywords = [
+
+        "my name is",
+
+        "remember",
+
+        "i like",
+
+        "i love",
+
+        "my favorite",
+
+        "i prefer",
+
+        "my project",
+
+        "i work",
+
+        "i am building"
+
+    ]
+
+
+
     for keyword in important_keywords:
 
+
         if keyword in text:
+
 
             memory["type"] = "long_term"
 
@@ -54,9 +117,16 @@ def analyze_memory(message):
             break
 
 
+
     return memory
 
 
+
+
+
+# ===========================================
+# TEST
+# ===========================================
 
 if __name__ == "__main__":
 
@@ -65,9 +135,11 @@ if __name__ == "__main__":
 
         "My name is Timilehin",
 
-        "Calculate 50+50",
+        "I love Python",
 
-        "Remember I like Python"
+        "What do you remember about me?",
+
+        "Calculate 50+50"
 
     ]
 
