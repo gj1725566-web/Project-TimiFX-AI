@@ -1,12 +1,13 @@
 """
 ===========================================
 TimiFX AI Memory Manager
-Phase 26
+Phase 31
 
 Responsible for:
 
 - Saving memories
 - Loading memories
+- Preventing duplicate memories
 - Separating long-term and short-term memory
 - Managing JSON memory database
 
@@ -14,11 +15,9 @@ Author: Timilehin
 ===========================================
 """
 
-
 import os
 import json
 from datetime import datetime
-
 
 
 PROJECT_ROOT = os.path.dirname(
@@ -27,21 +26,15 @@ PROJECT_ROOT = os.path.dirname(
     )
 )
 
-
-
 DATABASE_PATH = os.path.join(
     PROJECT_ROOT,
     "database"
 )
 
-
-
 LONG_TERM_FILE = os.path.join(
     DATABASE_PATH,
     "long_term_memory.json"
 )
-
-
 
 SHORT_TERM_FILE = os.path.join(
     DATABASE_PATH,
@@ -49,9 +42,8 @@ SHORT_TERM_FILE = os.path.join(
 )
 
 
-
 # ===========================================
-# Ensure Database Exists
+# Create Database
 # ===========================================
 
 def create_database():
@@ -60,7 +52,6 @@ def create_database():
         DATABASE_PATH,
         exist_ok=True
     )
-
 
     if not os.path.exists(LONG_TERM_FILE):
 
@@ -71,11 +62,10 @@ def create_database():
         ) as file:
 
             json.dump(
-                {"memories":[]},
+                {"memories": []},
                 file,
                 indent=4
             )
-
 
     if not os.path.exists(SHORT_TERM_FILE):
 
@@ -86,11 +76,10 @@ def create_database():
         ) as file:
 
             json.dump(
-                {"memories":[]},
+                {"memories": []},
                 file,
                 indent=4
             )
-
 
 
 # ===========================================
@@ -101,15 +90,13 @@ def load_memory(file):
 
     create_database()
 
-
     with open(
         file,
         "r",
         encoding="utf-8"
-    ) as data:
+    ) as file:
 
-        return json.load(data)
-
+        return json.load(file)
 
 
 # ===========================================
@@ -132,59 +119,75 @@ def save_memory(file, data):
         )
 
 
-
 # ===========================================
 # Add Memory
 # ===========================================
 
 def add_memory(memory):
 
-
-    memory["created"] = str(
-        datetime.now()
-    )
-
+    memory["created"] = str(datetime.now())
 
     if memory["type"] == "long_term":
-
 
         database = load_memory(
             LONG_TERM_FILE
         )
 
+        for item in database["memories"]:
+
+            if (
+                item["content"].strip().lower()
+                ==
+                memory["content"].strip().lower()
+            ):
+
+                return {
+
+                    "saved": False,
+
+                    "memory": item
+
+                }
 
         database["memories"].append(
             memory
         )
-
 
         save_memory(
             LONG_TERM_FILE,
             database
         )
 
+        return {
+
+            "saved": True,
+
+            "memory": memory
+
+        }
 
     else:
-
 
         database = load_memory(
             SHORT_TERM_FILE
         )
 
-
         database["memories"].append(
             memory
         )
-
 
         save_memory(
             SHORT_TERM_FILE,
             database
         )
 
+        return {
 
-    return memory
+            "saved": True,
 
+            "memory": memory
+
+        }
 
 
 # ===========================================
@@ -193,70 +196,44 @@ def add_memory(memory):
 
 def get_all_memories():
 
-
-    long_term = load_memory(
-        LONG_TERM_FILE
-    )
-
-
-    short_term = load_memory(
-        SHORT_TERM_FILE
-    )
-
-
     return {
 
-        "long_term":
-        long_term["memories"],
+        "long_term": load_memory(
+            LONG_TERM_FILE
+        )["memories"],
 
-
-        "short_term":
-        short_term["memories"]
+        "short_term": load_memory(
+            SHORT_TERM_FILE
+        )["memories"]
 
     }
-
 
 
 # ===========================================
 # Test
 # ===========================================
 
-
 if __name__ == "__main__":
 
-
+    print("=" * 50)
+    print("TimiFX AI Memory Manager Test")
     print("=" * 50)
 
-    print(
-        "TimiFX AI Memory Manager Test"
-    )
+    test = {
 
-    print("=" * 50)
+        "content": "Timilehin likes Python",
 
+        "type": "long_term",
 
-
-    test_memory = {
-
-        "content":
-        "Timilehin likes Python",
-
-        "type":
-        "long_term",
-
-        "importance":
-        8
+        "importance": 8
 
     }
 
-
-
     print(
-        add_memory(test_memory)
+        add_memory(test)
     )
 
-
     print()
-
 
     print(
         get_all_memories()

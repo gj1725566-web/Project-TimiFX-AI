@@ -1,7 +1,7 @@
 """
 ===========================================
 TimiFX AI Learning Engine
-Phase 28
+Phase 31
 
 Responsible for:
 
@@ -17,9 +17,6 @@ Author: Timilehin
 import sys
 import os
 
-# ===========================================
-# Project Path
-# ===========================================
 
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(
@@ -28,17 +25,18 @@ PROJECT_ROOT = os.path.dirname(
 )
 
 if PROJECT_ROOT not in sys.path:
-    sys.path.append(PROJECT_ROOT)
 
-# ===========================================
-# Imports
-# ===========================================
+    sys.path.append(
+        PROJECT_ROOT
+    )
+
 
 from brain.memory_analyzer import analyze_memory
 from brain.memory_manager import add_memory
 
+
 # ===========================================
-# Learn From Message
+# Learn
 # ===========================================
 
 def learn(message):
@@ -47,15 +45,15 @@ def learn(message):
 
     if memory["type"] == "long_term":
 
-        saved_memory = add_memory(memory)
+        result = add_memory(memory)
 
         return {
 
             "learned": True,
 
-            "saved": True,
+            "saved": result["saved"],
 
-            "memory": saved_memory
+            "memory": result["memory"]
 
         }
 
@@ -68,6 +66,7 @@ def learn(message):
         "memory": memory
 
     }
+
 
 # ===========================================
 # Test
@@ -101,6 +100,6 @@ if __name__ == "__main__":
 
         print()
 
-        result = learn(message)
-
-        print(result)
+        print(
+            learn(message)
+        )
